@@ -1,0 +1,4 @@
+# Root gitignore file
+
+# PyCharm
+.idea/
