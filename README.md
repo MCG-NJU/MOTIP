@@ -17,16 +17,42 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 ### DanceTrack
 
-| Method              | Training Data                                                | HOTA | DetA | AssA | MOTA | IDF1 |
-| ------------------- | ------------------------------------------------------------ | ---- | ---- | ---- | ---- | ---- |
-| MOTIP               | <font size=2>DanceTrack train</font>                         | 67.5 | 79.4 | 57.6 | 90.3 | 72.2 |
-| MOTIP<sub>DAB</sub> | <font size=2>DanceTrack train</font>                         | 70.0 | 80.8 | 60.8 | 91.0 | 75.1 |
-| MOTIP               | <font size=2>DanceTrack train + <br>CrowdHuman trainval</font> | 71.4 | 81.3 | 62.8 | 91.6 | 76.3 |
+| Method              | Training Data | HOTA | DetA | AssA | MOTA | IDF1 |
+| ------------------- | ------------- | ---- | ---- | ---- | ---- | ---- |
+| MOTIP               | DT            | 67.5 | 79.4 | 57.6 | 90.3 | 72.2 |
+| MOTIP<sub>DAB</sub> | DT            | 70.0 | 80.8 | 60.8 | 91.0 | 75.1 |
+| MOTIP               | DT + CH       | 71.4 | 81.3 | 62.8 | 91.6 | 76.3 |
 
 <details>
   <summary><i>NOTE</i></summary>
   <ol>
     <li>MOTIP is built upon original Deformable DETR, while MOTIP<sub>DAB</sub> is based on DAB-Deformable DETR.</li>
+    <li>DT and CH are the abbreviations of DanceTrack and CrowdHuman respectively.</li>
   </ol>
 </details>
 
+### SportsMOT
+
+| Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 |
+| ------ | ------------- | ---- | ---- | ---- | ---- | ---- |
+| MOTIP  | Sports        | 71.9 | 83.4 | 62.0 | 92.9 | 75.0 |
+
+<details>
+  <summary><i>NOTE</i></summary>
+  <ol>
+    <li>Sports is the abbreviation of SportsMOT.</li>
+  </ol>
+</details>
+
+### MOT17
+
+| Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 |
+| ------ | ------------- | ---- | ---- | ---- | ---- | ---- |
+| MOTIP  | MOT17 + CH    | 59.2 | 62.0 | 56.9 | 75.5 | 71.2 |
+
+<details>
+  <summary><i>NOTE</i></summary>
+  <ol>
+    <li>CH is the abbreviation of CrowdHuman.</li>
+  </ol>
+</details>
