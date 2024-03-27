@@ -84,3 +84,52 @@ sh make.sh
 ```
 
 </details>
+
+
+
+
+<details>
+<summary><strong>Data Preparation</strong></summary>
+
+You can download the datasets from the following links:
+- [DanceTrack](https://github.com/DanceTrack/DanceTrack)
+- [SportsMOT](https://github.com/MCG-NJU/SportsMOT)
+- [MOT17](https://motchallenge.net/data/MOT17/)
+- [CrowdHuman](https://www.crowdhuman.org/)
+
+Then, you need to unzip and organize the data as follows:
+
+```
+DATADIR/
+  ├── DanceTrack/
+  │ ├── train/
+  │ ├── val/
+  │ ├── test/
+  │ ├── train_seqmap.txt
+  │ ├── val_seqmap.txt
+  │ └── test_seqmap.txt
+  ├── SportsMOT/
+  │ ├── train/
+  │ ├── val/
+  │ ├── test/
+  │ ├── train_seqmap.txt
+  │ ├── val_seqmap.txt
+  │ └── test_seqmap.txt
+  ├── MOT17/
+  │ ├── images/
+  │ │ ├── train/     # unzip from MOT17
+  │ │ └── test/      # unzip from MOT17
+  │ └── gts/
+  │   └── train/     # generate by ./data/gen_mot17_gts.py
+  └── CrowdHuman/
+    ├── images/
+    │ ├── train/     # unzip from CrowdHuman
+    │ └── val/       # unzip from CrowdHuman
+    └── gts/
+      ├── train/     # generate by ./data/gen_crowdhuman_gts.py
+      └── val/       # generate by ./data/gen_crowdhuman_gts.py
+```
+
+For MOT17 and CrowdHuman, you can generate the ground-truth files by running the corresponding scripts [gen_mot17_gts.py](./data/gen_mot17_gts.py) and [gen_crowdhuman_gts.py](./data/gen_crowdhuman_gts.py).
+
+</details>
