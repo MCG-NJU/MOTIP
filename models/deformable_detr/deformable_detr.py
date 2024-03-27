@@ -157,11 +157,7 @@ class DeformableDETR(nn.Module):
         query_embeds = None
         if not self.two_stage:
             query_embeds = self.query_embed.weight
-        (hs, init_reference, inter_references, enc_outputs_class, enc_outputs_coord_unact,
-         output, query_pos, reference_points_adapter,
-         src, src_spatial_shapes, src_level_start_index, src_padding_mask) = self.transformer(
-            srcs, masks, pos, query_embeds
-        )
+        hs, init_reference, inter_references, enc_outputs_class, enc_outputs_coord_unact = self.transformer(srcs, masks, pos, query_embeds)
 
         outputs_classes = []
         outputs_coords = []
@@ -192,10 +188,9 @@ class DeformableDETR(nn.Module):
             enc_outputs_coord = enc_outputs_coord_unact.sigmoid()
             out['enc_outputs'] = {'pred_logits': enc_outputs_class, 'pred_boxes': enc_outputs_coord}
 
-        # Output the outputs of last decoder layer:
+        # Output the outputs of last decoder layer.
+        # We need these outputs to generate the embeddings for objects.
         out["outputs"] = hs[-1]
-        out["adapter"] = [output, query_pos, reference_points_adapter,
-                          src, src_spatial_shapes, src_level_start_index, src_padding_mask]
         return out
 
     @torch.jit.unused

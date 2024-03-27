@@ -177,24 +177,14 @@ class DeformableTransformer(nn.Module):
             init_reference_out = reference_points
 
         # decoder
-        # hs, inter_references = self.decoder(tgt, reference_points, memory,
-        #                                     spatial_shapes, level_start_index, valid_ratios, query_embed, mask_flatten)
-        (hs, inter_references,
-         output, query_pos, reference_points_adapter,
-         src, src_spatial_shapes, src_level_start_index, src_padding_mask) = self.decoder(
-            tgt, reference_points, memory, spatial_shapes, level_start_index, valid_ratios, query_embed, mask_flatten
-        )
+        hs, inter_references = self.decoder(tgt, reference_points, memory,
+                                            spatial_shapes, level_start_index, valid_ratios, query_embed, mask_flatten)
 
         inter_references_out = inter_references
         if self.two_stage:
             raise RuntimeError(f"You should not use 'two stage'.")
             return hs, init_reference_out, inter_references_out, enc_outputs_class, enc_outputs_coord_unact
-        # return hs, init_reference_out, inter_references_out, None, None
-        return (
-            hs, init_reference_out, inter_references_out, None, None,
-            output, query_pos, reference_points_adapter,
-            src, src_spatial_shapes, src_level_start_index, src_padding_mask
-        )
+        return hs, init_reference_out, inter_references_out, None, None
 
 
 class DeformableTransformerEncoderLayer(nn.Module):
@@ -366,24 +356,7 @@ class DeformableTransformerDecoder(nn.Module):
                 intermediate_reference_points.append(reference_points)
 
         if self.return_intermediate:
-            # return torch.stack(intermediate), torch.stack(intermediate_reference_points)
-            if reference_points.shape[-1] == 4:
-                reference_points_adapter = reference_points[:, :, None] \
-                                         * torch.cat([src_valid_ratios, src_valid_ratios], -1)[:, None]
-            else:
-                assert reference_points.shape[-1] == 2
-                reference_points_adapter = reference_points[:, :, None] * src_valid_ratios[:, None]
-            return (
-                torch.stack(intermediate),
-                torch.stack(intermediate_reference_points),
-                output,
-                query_pos,
-                reference_points_adapter,
-                src,
-                src_spatial_shapes,
-                src_level_start_index,
-                src_padding_mask
-            )
+            return torch.stack(intermediate), torch.stack(intermediate_reference_points)
 
         raise RuntimeError(f"You should use 'return_intermediate=True'.")
         return output, reference_points
