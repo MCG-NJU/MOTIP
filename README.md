@@ -19,7 +19,7 @@ It directly predicts the ID labels for each object in the tracking process, whic
 - <span style="font-variant-numeric: tabular-nums;">*2024.03.26*</span>: The paper is released on [arXiv](https://arxiv.org/abs/2403.16848), the code will be available in several days :soon:.
 
 
-## Main Results
+## Main Results :chart_with_upwards_trend:
 
 ### DanceTrack
 
@@ -61,4 +61,26 @@ It directly predicts the ID labels for each object in the tracking process, whic
   <ol>
     <li>CH is the abbreviation of CrowdHuman.</li>
   </ol>
+</details>
+
+
+## Quick Start :dash:
+
+<details>
+<summary><strong>Dependencies Install</strong></summary>
+
+```bash
+# Suggest python version >= 3.10
+conda create -n MOTIP python=3.11
+conda activate MOTIP
+# Now we only support pytorch version >= 2.0, we will support pytorch version <= 1.13 in the future
+conda install pytorch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 pytorch-cuda=11.8 -c pytorch -c nvidia
+# Other dependencies
+conda install matplotlib pyyaml scipy tqdm tensorboard seaborn scikit-learn pandas
+pip install opencv-python einops wandb pycocotools timm
+# Compile the Deformable Attention
+cd models/ops/
+sh make.sh
+```
+
 </details>
