@@ -53,11 +53,11 @@ def gen_labels_crowd(data_root, label_root, ann_root):
 
 
 if __name__ == '__main__':
-    data_val = "/data0/DataForMeMOTRv2/CrowdHuman/val/images"
-    label_val = "/data0/DataForMeMOTRv2/CrowdHuman/val/gts"
-    ann_val = "/data0/DataForMeMOTRv2/CrowdHuman/annotation_val.odgt"
-    data_train = "/data0/DataForMeMOTRv2/CrowdHuman/train/images"
-    label_train = "/data0/DataForMeMOTRv2/CrowdHuman/train/gts"
-    ann_train = "/data0/DataForMeMOTRv2/CrowdHuman/annotation_train.odgt"
+    data_val = "./datasets/CrowdHuman/val/images"
+    label_val = "./datasets/CrowdHuman/val/gts"
+    ann_val = "./datasets/CrowdHuman/annotation_val.odgt"
+    data_train = "./datasets/CrowdHuman/train/images"
+    label_train = "./datasets/CrowdHuman/train/gts"
+    ann_train = "./datasets/CrowdHuman/annotation_train.odgt"
     gen_labels_crowd(data_train, label_train, ann_train)
     gen_labels_crowd(data_val, label_val, ann_val)

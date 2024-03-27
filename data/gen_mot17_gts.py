@@ -13,12 +13,12 @@ def mkdirs(d):
         os.makedirs(d)
 
 
-# seq_root = "/data0/DataForMeMOTRv2/MOT17/train/"
-# seq_root = "/data0/DataForMeMOTRv2/MOT17_SPLIT/train/"
-seq_root = "/data0/DataForMeMOTRv2/MOT17_SPLIT/val/"
-# label_root = "/data0/DataForMeMOTRv2/MOT17/train/"
-# label_root = "/data0/DataForMeMOTRv2/MOT17_SPLIT/train/"
-label_root = "/data0/DataForMeMOTRv2/MOT17_SPLIT/val/"
+seq_root = "./datasets/MOT17/train/"
+# seq_root = "./datasets/MOT17_SPLIT/train/"
+# seq_root = "./datasets/MOT17_SPLIT/val/"
+label_root = "./datasets/MOT17/train/"
+# label_root = "./datasets/MOT17_SPLIT/train/"
+# label_root = "./datasets/MOT17_SPLIT/val/"
 mkdirs(label_root)
 seqs = [s for s in os.listdir(seq_root)]
 
