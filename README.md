@@ -5,7 +5,7 @@ This is the official PyTorch implementation of our paper:
 > ***[Multiple Object Tracking as ID Prediction](https://arxiv.org/abs/2403.16848)*** <br>
 > [Ruopeng Gao](https://ruopenggao.com/), Yijun Zhang, [Limin Wang](https://wanglimin.github.io/)
 
-## Overview
+## Overview :mag:
 
 **TL; DR.** MOTIP proposes a new perspective to regard the multi-object tracking task as an ID prediction problem. 
 It directly predicts the ID labels for each object in the tracking process, which is more straightforward and effective.
@@ -23,11 +23,11 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 ### DanceTrack :dancer:
 
-| Method              | Training Data | HOTA | DetA | AssA | MOTA | IDF1 |
-| ------------------- | ------------- | ---- | ---- | ---- | ---- | ---- |
-| MOTIP               | DT            | 67.5 | 79.4 | 57.6 | 90.3 | 72.2 |
-| MOTIP<sub>DAB</sub> | DT            | 70.0 | 80.8 | 60.8 | 91.0 | 75.1 |
-| MOTIP               | DT + CH       | 71.4 | 81.3 | 62.8 | 91.6 | 76.3 |
+| Method              | Training Data | HOTA | DetA | AssA | MOTA | IDF1 | URLs                                                         |
+| ------------------- | ------------- | ---- | ---- | ---- | ---- | ---- | ------------------------------------------------------------ |
+| MOTIP               | DT            | 67.5 | 79.4 | 57.6 | 90.3 | 72.2 | [model](https://drive.google.com/file/d/1qNGN7RsDf6a3i5lwjb0V8v6mKzxaMh0G/view?usp=drive_link), [config](./configs/r50_deformable_detr_motip_dancetrack.yaml), [log](https://drive.google.com/file/d/1XRRBjw92bQk7FUGxmZSsrTf5BjXbL2pp/view?usp=drive_link) |
+| MOTIP<sub>DAB</sub> | DT            | 70.0 | 80.8 | 60.8 | 91.0 | 75.1 | TBD                                                          |
+| MOTIP               | DT + CH       | 71.4 | 81.3 | 62.8 | 91.6 | 76.3 | *TBD*                                                        |
 
 <details>
   <summary><i>NOTE</i></summary>
@@ -39,9 +39,9 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 ### SportsMOT :basketball:
 
-| Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 |
-| ------ | ------------- | ---- | ---- | ---- | ---- | ---- |
-| MOTIP  | Sports        | 71.9 | 83.4 | 62.0 | 92.9 | 75.0 |
+| Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 | URLs                                                         |
+| ------ | ------------- | ---- | ---- | ---- | ---- | ---- | ------------------------------------------------------------ |
+| MOTIP  | Sports        | 71.9 | 83.4 | 62.0 | 92.9 | 75.0 | [model](https://drive.google.com/file/d/1NIw77CBt8xEoZxHrUg14vrPYBCXUUgq-/view?usp=drive_link), [config](./configs/r50_deformable_detr_motip_sportsmot.yaml), [log](https://drive.google.com/file/d/1SNZ60uxVCdU5Poza0fXztWSGaZifVdaD/view?usp=drive_link) |
 
 <details>
   <summary><i>NOTE</i></summary>
@@ -52,9 +52,9 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 ### MOT17 :walking:
 
-| Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 |
-| ------ | ------------- | ---- | ---- | ---- | ---- | ---- |
-| MOTIP  | MOT17 + CH    | 59.2 | 62.0 | 56.9 | 75.5 | 71.2 |
+| Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 | URLs  |
+| ------ | ------------- | ---- | ---- | ---- | ---- | ---- | ----- |
+| MOTIP  | MOT17 + CH    | 59.2 | 62.0 | 56.9 | 75.5 | 71.2 | *TBD* |
 
 <details>
   <summary><i>NOTE</i></summary>
