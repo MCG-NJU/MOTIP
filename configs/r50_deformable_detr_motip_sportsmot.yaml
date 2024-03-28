@@ -1,0 +1,11 @@
+SUPER_CONFIG_PATH: ./configs/r50_deformable_detr_motip_dancetrack.yaml
+
+DATASETS: [SportsMOT]
+DATASET_SPLITS: [train]
+INFERENCE_DATASET: SportsMOT
+INFERENCE_SPLIT: val
+
+DETR_PRETRAIN: ./pretrains/r50_deformable_detr_coco_sportsmot.pth
+
+EPOCHS: 18
+SCHEDULER_MILESTONES: [10, 16]
