@@ -21,7 +21,7 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 ## Main Results :chart_with_upwards_trend:
 
-### DanceTrack
+### DanceTrack :dancer:
 
 | Method              | Training Data | HOTA | DetA | AssA | MOTA | IDF1 |
 | ------------------- | ------------- | ---- | ---- | ---- | ---- | ---- |
@@ -37,7 +37,7 @@ It directly predicts the ID labels for each object in the tracking process, whic
   </ol>
 </details>
 
-### SportsMOT
+### SportsMOT :basketball:
 
 | Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 |
 | ------ | ------------- | ---- | ---- | ---- | ---- | ---- |
@@ -50,7 +50,7 @@ It directly predicts the ID labels for each object in the tracking process, whic
   </ol>
 </details>
 
-### MOT17
+### MOT17 :man_walking:
 
 | Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 |
 | ------ | ------------- | ---- | ---- | ---- | ---- | ---- |
