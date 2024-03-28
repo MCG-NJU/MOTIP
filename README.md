@@ -133,3 +133,18 @@ DATADIR/
 For MOT17 and CrowdHuman, you can generate the ground-truth files by running the corresponding scripts [gen_mot17_gts.py](./data/gen_mot17_gts.py) and [gen_crowdhuman_gts.py](./data/gen_crowdhuman_gts.py).
 
 </details>
+
+
+<details>
+<summary><strong>Evaluate the model</strong></summary>
+
+- Get tracking results for submitting:
+  ```bash
+  python -m torch.distributed.run --nproc_per_node=<gpu num> main.py --mode submit --use-distributed True --use-wandb False --config-path <config file path> --inference-model <checkpoint path> --outputs-dir <outputs dir> --inference-dataset <dataset name> --inference-split <dataset split>
+  ```
+  For example, you can submit the model on DanceTrack test set as follows:
+  ```bash
+  python -m torch.distributed.run --nproc_per_node=8 main.py --mode submit --use-distributed True --use-wandb False --config-path ./configs/r50_deformable_detr_motip_dancetrack.yaml --inference-model ./outputs/r50_deformable_detr_motip_dancetrack.pth --outputs-dir ./outputs/dancetrack_trackers/ --inference-dataset DanceTrack --inference-split test
+  ```
+
+</details>
