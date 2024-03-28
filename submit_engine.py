@@ -28,7 +28,10 @@ def submit(config: dict, logger: Logger):
     :param logger:
     :return:
     """
-    model_config = yaml_to_dict(path=config["INFERENCE_CONFIG_PATH"])
+    if config["INFERENCE_CONFIG_PATH"] is None:
+        model_config = config
+    else:
+        model_config = yaml_to_dict(path=config["INFERENCE_CONFIG_PATH"])
     model = build_model(config=model_config)
     load_checkpoint(model, path=config["INFERENCE_MODEL"])
 

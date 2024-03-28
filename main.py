@@ -7,7 +7,7 @@ from utils.utils import yaml_to_dict, is_main_process, distributed_rank, set_see
 from log.logger import Logger, parser_to_dict
 from configs.utils import update_config, load_super_config
 # from train_engine import train
-from eval_engine import evaluate
+# from eval_engine import evaluate
 from submit_engine import submit
 # from engine import train, evaluate
 
