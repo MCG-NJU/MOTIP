@@ -50,7 +50,7 @@ It directly predicts the ID labels for each object in the tracking process, whic
   </ol>
 </details>
 
-### MOT17 :man_walking:
+### MOT17 :walking:
 
 | Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 |
 | ------ | ------------- | ---- | ---- | ---- | ---- | ---- |
