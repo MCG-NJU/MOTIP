@@ -3,7 +3,10 @@
 This is the official PyTorch implementation of our paper:
 
 > ***[Multiple Object Tracking as ID Prediction](https://arxiv.org/abs/2403.16848)*** <br>
-> [Ruopeng Gao](https://ruopenggao.com/), Yijun Zhang, [Limin Wang](https://wanglimin.github.io/)
+> :mortar_board: [Ruopeng Gao](https://ruopenggao.com/), Yijun Zhang, [Limin Wang](https://wanglimin.github.io/) <br>
+> :e-mail: Primary contact: ruopenggao@gmail.com
+
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/multiple-object-tracking-as-id-prediction/multi-object-tracking-on-dancetrack)](https://paperswithcode.com/sota/multi-object-tracking-on-dancetrack?p=multiple-object-tracking-as-id-prediction)
 
 ## Overview :mag:
 
@@ -26,19 +29,22 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 ### DanceTrack :dancer:
 
-| Method              | Training Data | HOTA | DetA | AssA | MOTA | IDF1 | URLs                                                         |
-| ------------------- | ------------- | ---- | ---- | ---- | ---- | ---- | ------------------------------------------------------------ |
-| MOTIP               | DT            | 67.5 | 79.4 | 57.6 | 90.3 | 72.2 | [model](https://drive.google.com/file/d/1qNGN7RsDf6a3i5lwjb0V8v6mKzxaMh0G/view?usp=drive_link), [config](./configs/r50_deformable_detr_motip_dancetrack.yaml), [log](https://drive.google.com/file/d/1XRRBjw92bQk7FUGxmZSsrTf5BjXbL2pp/view?usp=drive_link) |
-| MOTIP<sub>DAB</sub> | DT            | 70.0 | 80.8 | 60.8 | 91.0 | 75.1 | TBD                                                          |
-| MOTIP               | DT + CH       | 71.4 | 81.3 | 62.8 | 91.6 | 76.3 | *TBD*                                                        |
+| Method              | Training Data       | HOTA | DetA | AssA | MOTA | IDF1 | URLs                                                         |
+| ------------------- | ------------------- | ---- | ---- | ---- | ---- | ---- | ------------------------------------------------------------ |
+| MOTIP               | DT                  | 67.5 | 79.4 | 57.6 | 90.3 | 72.2 | [model](https://drive.google.com/file/d/1qNGN7RsDf6a3i5lwjb0V8v6mKzxaMh0G/view?usp=drive_link), [config](./configs/r50_deformable_detr_motip_dancetrack.yaml), [log](https://drive.google.com/file/d/1XRRBjw92bQk7FUGxmZSsrTf5BjXbL2pp/view?usp=drive_link) |
+| MOTIP<sub>DAB</sub> | DT                  | 70.0 | 80.8 | 60.8 | 91.0 | 75.1 | *TBD*                                                        |
+| MOTIP               | DT + CH             | 71.4 | 81.3 | 62.8 | 91.6 | 76.3 | *TBD*                                                        |
+| MOTIP               | DT<sup>*</sup> + CH | 73.7 | 82.6 | 65.9 | 92.7 | 78.4 | *TBD*                                                        |
 
 <details>
   <summary><i>NOTE</i></summary>
   <ol>
     <li>MOTIP is built upon original Deformable DETR, while MOTIP<sub>DAB</sub> is based on DAB-Deformable DETR.</li>
     <li>DT and CH are the abbreviations of DanceTrack and CrowdHuman respectively.</li>
+    <li>DT<sup>*</sup> denotes we utilize both the training and validation set of DanceTrack for training.</li>
   </ol>
 </details>
+
 
 ### SportsMOT :basketball:
 
