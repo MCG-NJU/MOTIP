@@ -120,7 +120,8 @@ def submit_one_seq(
     os.makedirs(os.path.join(outputs_dir, "tracker"), exist_ok=True)
     seq_dataset = SeqDataset(seq_dir=seq_dir, dataset=dataset, width=image_max_size)
     seq_dataloader = DataLoader(seq_dataset, batch_size=1, num_workers=4, shuffle=False)
-    seq_name = seq_dir.split("/")[-1]
+    # seq_name = seq_dir.split("/")[-1]
+    seq_name = os.path.split(seq_dir)[-1]
     device = model.device
     current_id = 0
     ids_to_results = {}
