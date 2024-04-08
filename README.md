@@ -61,9 +61,9 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 ### MOT17 :walking:
 
-| Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 | URLs  |
-| ------ | ------------- | ---- | ---- | ---- | ---- | ---- | ----- |
-| MOTIP  | MOT17 + CH    | 59.2 | 62.0 | 56.9 | 75.5 | 71.2 | *TBD* |
+| Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 | URLs                                                         |
+| ------ | ------------- | ---- | ---- | ---- | ---- | ---- | ------------------------------------------------------------ |
+| MOTIP  | MOT17 + CH    | 59.2 | 62.0 | 56.9 | 75.5 | 71.2 | [model](https://drive.google.com/file/d/1ZsojRYBCbH9u9m1C5leb1MwmBB42sox8/view?usp=drive_link), [config](./configs/r50_deformable_detr_motip_mot17.yaml), [log](https://drive.google.com/file/d/1RB0XasyMMJFziB5wuyT208jMBLW37CPM/view?usp=drive_link) |
 
 <details>
   <summary><i>NOTE</i></summary>
