@@ -6,7 +6,9 @@ This is the official PyTorch implementation of our paper:
 > :mortar_board: [Ruopeng Gao](https://ruopenggao.com/), Yijun Zhang, [Limin Wang](https://wanglimin.github.io/) <br>
 > :e-mail: Primary contact: ruopenggao@gmail.com
 
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/multiple-object-tracking-as-id-prediction/multi-object-tracking-on-dancetrack)](https://paperswithcode.com/sota/multi-object-tracking-on-dancetrack?p=multiple-object-tracking-as-id-prediction)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/multiple-object-tracking-as-id-prediction/multi-object-tracking-on-dancetrack)](https://paperswithcode.com/sota/multi-object-tracking-on-dancetrack?p=multiple-object-tracking-as-id-prediction)<br>
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/multiple-object-tracking-as-id-prediction/multiple-object-tracking-on-sportsmot)](https://paperswithcode.com/sota/multiple-object-tracking-on-sportsmot?p=multiple-object-tracking-as-id-prediction)<br>
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/multiple-object-tracking-as-id-prediction/multi-object-tracking-on-mot17)](https://paperswithcode.com/sota/multi-object-tracking-on-mot17?p=multiple-object-tracking-as-id-prediction)<br>
 
 ## Overview :mag:
 
