@@ -53,13 +53,17 @@ It directly predicts the ID labels for each object in the tracking process, whic
 | Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 | URLs                                                         |
 | ------ | ------------- | ---- | ---- | ---- | ---- | ---- | ------------------------------------------------------------ |
 | MOTIP  | Sports        | 71.9 | 83.4 | 62.0 | 92.9 | 75.0 | [model](https://drive.google.com/file/d/1NIw77CBt8xEoZxHrUg14vrPYBCXUUgq-/view?usp=drive_link), [config](./configs/r50_deformable_detr_motip_sportsmot.yaml), [log](https://drive.google.com/file/d/1SNZ60uxVCdU5Poza0fXztWSGaZifVdaD/view?usp=drive_link) |
+| MOTIP  | Sports*       | 75.2 | 86.5 | 65.4 | 96.1 | 78.2 | [model](https://drive.google.com/file/d/1DTQenGa5WuFLVi_z7-07jsHBjTpiYGv_/view?usp=drive_link), [config*](./configs/r50_deformable_detr_motip_sportsmot.yaml), [log](https://drive.google.com/file/d/14eqHQh8pFc8vxpGRF9CMNp5yeMIA-tXQ/view?usp=drive_link) |
 
 <details>
   <summary><i>NOTE</i></summary>
   <ol>
     <li>Sports is the abbreviation of SportsMOT.</li>
+    <li>Sports<sup>*</sup> denotes we utilize both the training and validation set of SportsMOT for training.</li>
+    <li>config* represents the configuration that can be used for inference. The corresponding training config file has not been uploaded yet.</li>
   </ol>
 </details>
+
 
 ### MOT17 :walking:
 
