@@ -7,6 +7,7 @@ from scipy.optimize import linear_sum_assignment
 from torch.utils.checkpoint import checkpoint
 from .seq_decoder import SeqDecoder
 from .deformable_detr.deformable_detr import build as build_deformable_detr
+from .dab_deformable_detr.dab_deformable_detr import build_dab_deformable_detr
 from structures.instances import Instances
 from structures.args import Args
 from utils.utils import batch_iterator, combine_detr_outputs
