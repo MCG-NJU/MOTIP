@@ -31,12 +31,12 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 ### DanceTrack :dancer:
 
-| Method              | Training Data       | HOTA | DetA | AssA | MOTA | IDF1 | URLs                                                         |
-| ------------------- | ------------------- | ---- | ---- | ---- | ---- | ---- | ------------------------------------------------------------ |
-| MOTIP               | DT                  | 67.5 | 79.4 | 57.6 | 90.3 | 72.2 | [model](https://drive.google.com/file/d/1qNGN7RsDf6a3i5lwjb0V8v6mKzxaMh0G/view?usp=drive_link), [config](./configs/r50_deformable_detr_motip_dancetrack.yaml), [log](https://drive.google.com/file/d/1XRRBjw92bQk7FUGxmZSsrTf5BjXbL2pp/view?usp=drive_link) |
-| MOTIP<sub>DAB</sub> | DT                  | 70.0 | 80.8 | 60.8 | 91.0 | 75.1 | [model](https://drive.google.com/file/d/1mVj_FgE4fGUaALZB3JEmiAlqFSnHHNLN/view?usp=drive_link), [config](./configs/r50_dab_deformable_detr_motip_dancetrack.yaml), [log](https://drive.google.com/file/d/1tACnXMvwNx1jq7EOTngcsb9KulU4125f/view?usp=drive_link) |
-| MOTIP               | DT + CH             | 71.4 | 81.3 | 62.8 | 91.6 | 76.3 | *TBD*                                                        |
-| MOTIP               | DT<sup>*</sup> + CH | 73.7 | 82.6 | 65.9 | 92.7 | 78.4 | *TBD*                                                        |
+| Method              | Training Data       | HOTA | DetA | AssA | MOTA | IDF1 | URLs                                                                                                                                                                                                                                                                 |
+| ------------------- | ------------------- | ---- | ---- | ---- | ---- | ---- |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| MOTIP               | DT                  | 67.5 | 79.4 | 57.6 | 90.3 | 72.2 | [model](https://drive.google.com/file/d/1qNGN7RsDf6a3i5lwjb0V8v6mKzxaMh0G/view?usp=drive_link), [config](./configs/r50_deformable_detr_motip_dancetrack.yaml), [log](https://drive.google.com/file/d/1XRRBjw92bQk7FUGxmZSsrTf5BjXbL2pp/view?usp=drive_link)          |
+| MOTIP<sub>DAB</sub> | DT                  | 70.0 | 80.8 | 60.8 | 91.0 | 75.1 | [model](https://drive.google.com/file/d/1mVj_FgE4fGUaALZB3JEmiAlqFSnHHNLN/view?usp=drive_link), [config](./configs/r50_dab_deformable_detr_motip_dancetrack.yaml), [log](https://drive.google.com/file/d/1tACnXMvwNx1jq7EOTngcsb9KulU4125f/view?usp=drive_link)      |
+| MOTIP               | DT + CH             | 71.4 | 81.3 | 62.8 | 91.6 | 76.3 | [model](https://drive.google.com/file/d/1BDvk6dxJh7LPCvkVC4ycGWNm4-DyVkbf/view?usp=drive_link), [config](./configs/r50_deformable_detr_motip_dancetrack_joint_ch.yaml), [log](https://drive.google.com/file/d/1JBrj5Jq5PXf7_ZO7xyrTEBDMm8HNxpX4/view?usp=drive_link) |
+| MOTIP               | DT<sup>*</sup> + CH | 73.7 | 82.6 | 65.9 | 92.7 | 78.4 | *TBD*                                                                                                                                                                                                                                                                |
 
 <details>
   <summary><i>NOTE</i></summary>
