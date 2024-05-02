@@ -1,0 +1,26 @@
+SUPER_CONFIG_PATH: ./configs/r50_deformable_detr_motip_dancetrack.yaml
+
+# Joint training with CrowdHuman:
+DATASETS: [DanceTrack, CrowdHuman, CrowdHuman]
+DATASET_SPLITS: [train, train, val]
+
+# Different pretrain weights:
+DETR_PRETRAIN: ./pretrains/r50_deformable_detr_coco_dancetrack_joint_ch.pth
+
+# Data augmentation setting for static images:
+AUG_RANDOM_SHIFT_MAX_RATIO: 0.05
+# Larger image size:
+AUG_RESIZE_SCALES: [608, 640, 672, 704, 736, 768, 800, 832, 864, 896, 928, 960, 992]
+AUG_MAX_SIZE: 1536
+AUG_RANDOM_RESIZE: [800, 1000, 1200]
+AUG_RANDOM_CROP_MIN: 800
+AUG_RANDOM_CROP_MAX: 1200
+INFERENCE_MAX_SIZE: 1536
+
+# Different training strategy:
+EPOCHS: 12
+SCHEDULER_MILESTONES: [10, ]
+
+# To avoid CUDA OOM:
+AUTO_MEMORY_OPTIMIZED_DETR_CRITERION: True
+DETR_CHECKPOINT_FRAMES: 2
