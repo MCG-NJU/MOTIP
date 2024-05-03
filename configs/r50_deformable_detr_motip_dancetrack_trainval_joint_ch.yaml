@@ -1,0 +1,12 @@
+SUPER_CONFIG_PATH: ./configs/r50_deformable_detr_motip_dancetrack_joint_ch.yaml
+
+# Joint training with CrowdHuman:
+DATASETS: [DanceTrack, DanceTrack, CrowdHuman, CrowdHuman]
+DATASET_SPLITS: [train, val, train, val]
+
+# Different pretrain weights:
+DETR_PRETRAIN: ./pretrains/r50_deformable_detr_coco_dancetrack_trainval_joint_ch.pth
+
+# Different training strategy:
+EPOCHS: 14
+SCHEDULER_MILESTONES: [10, 12, ]
