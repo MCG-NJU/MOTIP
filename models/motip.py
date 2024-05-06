@@ -115,6 +115,7 @@ class MOTIP(nn.Module):
                 training_num_id=config["NUM_ID_VOCABULARY"] if "TRAINING_NUM_ID" not in config else config["TRAINING_NUM_ID"],
                 device=self.device,
                 max_temporal_length=config["MAX_TEMPORAL_LENGTH"],
+                multi_times_id_decoder=config["MULTI_TIMES_ID_DECODER"] if "MULTI_TIMES_ID_DECODER" in config else 0,
             )
 
     def get_id_word_from_tgt(self, tgt):
@@ -130,6 +131,7 @@ class MOTIP(nn.Module):
             id_deque: OrderedSet,
             id_thresh: float = 0.1,
             newborn_thresh: float = 0.5,
+            inference_ensemble: int = 0,
     ):
         """
         :param trajectory_history: Historical trajectories.
@@ -140,6 +142,7 @@ class MOTIP(nn.Module):
         :param id_thresh: ID threshold.
         :param newborn_thresh: Newborn threshold,
                                only the conf higher than this threshold will be considered as a newborn target.
+        :param inference_ensemble: Ensemble times for inference.
         :return:
         """
         deque_max_length = trajectory_history.maxlen
@@ -164,10 +167,23 @@ class MOTIP(nn.Module):
             trajectory_id_set = set(torch.cat([_.ids for _ in trajectory_history_list[:-1]], dim=0).cpu().tolist())
             # Seq Decoding:
             pred_id_words, _ = self.seq_decoder(
-                track_seqs=[trajectory_history_list]
+                track_seqs=[trajectory_history_list],
+                inference_ensemble=inference_ensemble,
             )
-            id_confs = torch.softmax(pred_id_words, dim=-1)     # [1, N, K + 1]
-            id_confs = id_confs[0]                              # [N, K + 1]
+            if isinstance(pred_id_words, torch.Tensor):
+                id_confs = torch.softmax(pred_id_words, dim=-1)  # [1, N, K + 1]
+                id_confs = id_confs[0]  # [N, K + 1]
+            else:
+                assert isinstance(pred_id_words, list)
+                # id_confs = [torch.softmax(_, dim=1) for _ in pred_id_words]
+                id_confs = [_ for _ in pred_id_words]
+                id_confs = [_[0] for _ in id_confs]
+                _ensemble_n = len(id_confs)
+                id_confs = torch.stack(id_confs, dim=0)  # [T, N, K + 1]
+                id_confs = torch.sum(id_confs, dim=0)  # [N, K + 1]
+                id_confs = id_confs / _ensemble_n
+                id_confs = torch.softmax(id_confs, dim=-1)  # [N, K + 1]
+                pass
 
             ids = list()
             newborn_repeat = id_confs[:, -1:].repeat(1, len(id_confs) - 1)

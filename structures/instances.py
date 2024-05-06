@@ -68,6 +68,14 @@ class Instances:
             raise AttributeError("Cannot find field '{}' in the given Instances!".format(name))
         return self._fields[name]
 
+    def clone(self):
+        new_instances = Instances(self._image_size)
+        for k in self._fields.keys():
+            new_instances.set(
+                k, self._fields[k].clone() if isinstance(self._fields[k], torch.Tensor) else self._fields[k]
+            )
+        return new_instances
+
     def set(self, name: str, value: Any) -> None:
         """
         Set the field named `name` to `value`.

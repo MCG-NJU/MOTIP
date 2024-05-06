@@ -105,6 +105,7 @@ INFERENCE_SPLIT: val
 INFERENCE_CONFIG_PATH:          # mostly, you don't need to set this parameter. See submit_engine.py L34 for more details.
 INFERENCE_GROUP:
 INFERENCE_MAX_SIZE: 1333
+INFERENCE_ENSEMBLE: 0
 # Thresholds:
 ID_THRESH: 0.2
 DET_THRESH: 0.3

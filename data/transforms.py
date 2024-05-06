@@ -16,6 +16,7 @@ import random
 import PIL.Image
 import numpy as np
 import torchvision.transforms as T
+from torchvision.transforms import v2
 import torchvision.transforms.functional as F
 
 from math import floor, ceil
@@ -263,6 +264,21 @@ class MultiHSV:
             return cv2.cvtColor(img_hsv.astype(image.dtype), cv2.COLOR_HSV2RGB), info
 
         return zip(*[hsv(img, info) for img, info in zip(images, infos)])
+
+
+class MultiColorJitter:
+    def __init__(self, brightness=0.0, contrast=0.0, saturation=0.0, hue=0.0):
+        self.color_jitter = v2.ColorJitter(
+            brightness=brightness,
+            contrast=contrast,
+            saturation=saturation,
+            hue=hue
+        )
+
+    def __call__(self, images, infos):
+        params = self.color_jitter._get_params([images[0]])
+        images = [self.color_jitter._transform(_, params=params) for _ in images]
+        return images, infos
 
 
 class MultiReverseClip:

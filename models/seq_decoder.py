@@ -31,6 +31,7 @@ class SeqDecoder(nn.Module):
             training_num_id: int,
             device: str,
             max_temporal_length: int,
+            multi_times_id_decoder: int,
     ):
         super().__init__()
         self.detr_hidden_dim = detr_hidden_dim
@@ -43,6 +44,9 @@ class SeqDecoder(nn.Module):
         self.training_num_id = training_num_id
         self.device = device
         self.max_temporal_length = max_temporal_length
+        self.multi_times_id_decoder = multi_times_id_decoder
+        assert self.multi_times_id_decoder == 0 or self.multi_times_id_decoder >= 2, \
+            f"Currently, we only support multi_times_id_decoder == 0 OR >= 2, but get {self.multi_times_id_decoder}."
 
         assert self.detr_hidden_dim == self.hidden_dim, f"Currently, we only support the same hidden dim."
 
@@ -79,17 +83,76 @@ class SeqDecoder(nn.Module):
             traj_drop_ratio: float = 0.0,
             traj_switch_ratio: float = 0.0,
             use_checkpoint: bool = False,
+            inference_ensemble: int = 0,
     ):
-        format_seqs = self.prepare(
-            track_seqs=track_seqs,
-            traj_drop_ratio=traj_drop_ratio,
-            traj_switch_ratio=traj_switch_ratio,
-        )
+        if self.multi_times_id_decoder == 0 or not self.training:
+            # Original training and inference:
+            if self.training or inference_ensemble == 0:
+                format_seqs = self.prepare(
+                    track_seqs=track_seqs,
+                    traj_drop_ratio=traj_drop_ratio,
+                    traj_switch_ratio=traj_switch_ratio,
+                )
+                pred_id_words, gt_id_words = self.net_forward(
+                    format_seqs=format_seqs,
+                    use_checkpoint=use_checkpoint,
+                )
+            else:
+                assert inference_ensemble >= 2
+                format_seqs = self.prepare(
+                    track_seqs=track_seqs,
+                    traj_drop_ratio=traj_drop_ratio,
+                    traj_switch_ratio=traj_switch_ratio,
+                )
+                pred_id_words = []
+                gt_id_words = None
+                for ensemble_i in range(inference_ensemble):
+                    g = torch.Generator()
+                    g.manual_seed(ensemble_i)
+                    _id_shuffle = torch.randperm(self.training_num_id, generator=g).to(self.device)
+                    _format_seqs = copy.deepcopy(format_seqs)
+                    _N, _T = _format_seqs[0]["trajectory"]["ids"].shape
+                    _shuffled_ids = _id_shuffle[
+                        einops.rearrange(_format_seqs[0]["trajectory"]["ids"], "n t -> (n t)")
+                    ]
+                    _shuffled_ids = einops.rearrange(_shuffled_ids, "(n t) -> n t", n=_N, t=_T)
+                    _format_seqs[0]["trajectory"]["ids"] = _shuffled_ids
+                    _pred_id_words, _ = self.net_forward(
+                        format_seqs=_format_seqs,
+                        use_checkpoint=False,
+                    )
+                    _pred_id_words = _pred_id_words[:, :, torch.cat(
+                        [_id_shuffle, torch.tensor([self.num_id_vocabulary], device=self.device, dtype=torch.long)]
+                    )]
+                    pred_id_words.append(_pred_id_words)
+        else:
+            pred_id_words, gt_id_words = None, None
+            for _time in range(self.multi_times_id_decoder):
+                assert len(track_seqs) == 1, f"SeqDecoder currently only support BS=1, but get BS={len(track_seqs)}."
+                _track_seqs = [[
+                    _.clone() for _ in track_seqs[0]
+                ]]
+                # Random the IDs in the track_seqs:
+                _id_map = torch.randperm(self.training_num_id).to(self.device)
+                for t in range(len(_track_seqs[0])):
+                    _track_seqs[0][t].ids = _id_map[_track_seqs[0][t].ids]
+                format_seqs = self.prepare(
+                    track_seqs=_track_seqs,
+                    traj_drop_ratio=traj_drop_ratio,
+                    traj_switch_ratio=traj_switch_ratio,
+                )
+                _pred_id_words, _gt_id_words = self.net_forward(
+                    format_seqs=format_seqs,
+                    use_checkpoint=use_checkpoint,
+                )
+                if pred_id_words is None:
+                    pred_id_words = _pred_id_words
+                    gt_id_words = _gt_id_words
+                else:
+                    pred_id_words = torch.cat([pred_id_words, _pred_id_words], dim=1)
+                    gt_id_words = torch.cat([gt_id_words, _gt_id_words], dim=1)
 
-        pred_id_words, gt_id_words = self.net_forward(
-            format_seqs=format_seqs,
-            use_checkpoint=use_checkpoint,
-        )
+        return pred_id_words, gt_id_words
 
         return pred_id_words, gt_id_words
 
