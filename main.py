@@ -6,10 +6,9 @@ import torch.distributed
 from utils.utils import yaml_to_dict, is_main_process, distributed_rank, set_seed
 from log.logger import Logger, parser_to_dict
 from configs.utils import update_config, load_super_config
-# from train_engine import train
-# from eval_engine import evaluate
+from train_engine import train
+from eval_engine import evaluate
 from submit_engine import submit
-# from engine import train, evaluate
 
 
 def parse_option():
