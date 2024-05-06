@@ -18,7 +18,7 @@ from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import RandomSampler, SequentialSampler, DataLoader
 
 from utils.utils import is_distributed
-# from .mot_dataset import build as build_mot_dataset
+from .mot_dataset import build as build_mot_dataset
 from .utils import collate_fn
 
 
