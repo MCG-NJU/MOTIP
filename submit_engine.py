@@ -89,6 +89,7 @@ def submit_one_epoch(config: dict, model: nn.Module,
                 newborn_thresh=config["DET_THRESH"] if "NEWBORN_THRESH" not in config else config["NEWBORN_THRESH"],
                 area_thresh=config["AREA_THRESH"], id_thresh=config["ID_THRESH"],
                 image_max_size=config["INFERENCE_MAX_SIZE"] if "INFERENCE_MAX_SIZE" in config else 1333,
+                inference_ensemble=config["INFERENCE_ENSEMBLE"] if "INFERENCE_ENSEMBLE" in config else 0,
             )
     else:   # fake submit, will not write any outputs.
         submit_one_seq(
@@ -100,7 +101,8 @@ def submit_one_epoch(config: dict, model: nn.Module,
             newborn_thresh=config["DET_THRESH"] if "NEWBORN_THRESH" not in config else config["NEWBORN_THRESH"],
             area_thresh=config["AREA_THRESH"], id_thresh=config["ID_THRESH"],
             image_max_size=config["INFERENCE_MAX_SIZE"] if "INFERENCE_MAX_SIZE" in config else 1333,
-            fake_submit=True
+            fake_submit=True,
+            inference_ensemble=config["INFERENCE_ENSEMBLE"] if "INFERENCE_ENSEMBLE" in config else 0,
         )
 
     if is_distributed():
@@ -116,6 +118,7 @@ def submit_one_seq(
             det_thresh: float = 0.5, newborn_thresh: float = 0.5, area_thresh: float = 100, id_thresh: float = 0.1,
             image_max_size: int = 1333,
             fake_submit: bool = False,
+            inference_ensemble: int = 0,
         ):
     os.makedirs(os.path.join(outputs_dir, "tracker"), exist_ok=True)
     seq_dataset = SeqDataset(seq_dir=seq_dir, dataset=dataset, width=image_max_size)
@@ -199,6 +202,7 @@ def submit_one_seq(
                     id_deque=id_deque,
                     id_thresh=id_thresh,
                     newborn_thresh=newborn_thresh,
+                    inference_ensemble=inference_ensemble,
                 )   # already update the trajectory history/ids_to_results/current_id/id_deque in this function
                 id_results = []
                 for _ in ids:
