@@ -176,7 +176,7 @@ For MOT17 and CrowdHuman, you can generate the ground-truth files by running the
 
   Using this script, you can achieve 66.2 ~ 67.6 HOTA on DanceTrack test set. This relatively high instability (~ 1.5) is also encountered in other work (e.g., [OC-SORT](https://github.com/noahcao/OC_SORT), [MOTRv2](https://github.com/megvii-research/MOTRv2/issues/2), [MeMOTR](https://github.com/MCG-NJU/MeMOTR/issues/17)). We suggest that part of the reason comes from the DanceTrack dataset itself, because the final performance on the MOT17 or SportsMOT test set will be more stable (~ 0.2 HOTA and ~ 0.5 HOTA).
 
-- Training with gradient checkpoint:
+- Training with gradient checkpoint: <br>
   Using gradient checkpoint technique can reduce CUDA memory usage. You can use the parameter `--detr-checkpoint-frames` (< 4) to determine the number of frames processed at once, thereby running on GPUs with less than 24GB memory.
   For example, you can train the model on DanceTrack with 8 TITAN XP GPUs as follows:
 
