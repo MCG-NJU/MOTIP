@@ -151,6 +151,44 @@ For MOT17 and CrowdHuman, you can generate the ground-truth files by running the
 </details>
 
 
+<details id="pretrain">
+<summary><strong>Pre-train DETR</strong></summary>
+*TBD* :soon:
+
+:floppy_disk: ***You can also download the pre-trained weights from [Google Drive :cloud:](https://drive.google.com/drive/folders/1O1HUxJJaDBORG6XEBk2QcWeXKqAblbxa?usp=drive_link), and then put them into ./pretrains/ directory.***
+
+</details>
+
+
+<details id="train">
+<summary><strong>Train MOTIP</strong></summary>
+
+- Default training:
+  ```bash
+  python -m torch.distributed.run --nproc_per_node=8 main.py --mode train --use-distributed True --use-wandb False --config-path <config file path> --outputs-dir <outputs dir>
+  ```
+
+  For example, you can train the model on DanceTrack as follows:
+
+  ```bash
+  python -m torch.distributed.run --nproc_per_node=8 main.py --mode train --use-distributed True --use-wandb False --config-path ./configs/r50_deformable_detr_motip_dancetrack.yaml --outputs-dir ./outputs/r50_deformable_detr_motip_dancetrack/
+  ```
+
+  Using this script, you can achieve 66.2 ~ 67.6 HOTA on DanceTrack test set. This relatively high instability (~ 1.5) is also encountered in other work (e.g., [OC-SORT]([Python3 capitalize()方法 | 菜鸟教程 (github.com)](https://github.com/noahcao/OC_SORT)), [MOTRv2]([This can get HOTA 69.9? · Issue #2 · megvii-research/MOTRv2 (github.com)](https://github.com/megvii-research/MOTRv2/issues/2)), [MeMOTR]([Performance Reproduction · Issue #17 · MCG-NJU/MeMOTR (github.com)](https://github.com/MCG-NJU/MeMOTR/issues/17))). We suggest that part of the reason comes from the DanceTrack dataset itself, because the final performance on the MOT17 or SportsMOT test set will be more stable (~ 0.2 HOTA and ~ 0.5 HOTA).
+
+- Training with gradient checkpoint:
+  Using gradient checkpoint technique can reduce CUDA memory usage. You can use the parameter `--detr-checkpoint-frames` (< 4) to determine the number of frames processed at once, thereby running on GPUs with less than 24GB memory.
+  For example, you can train the model on DanceTrack with 8 TITAN XP GPUs as follows:
+
+  ```bash
+  python -m torch.distributed.run --nproc_per_node=8 main.py --mode train --use-distributed True --use-wandb False --config-path ./configs/r50_deformable_detr_motip_dancetrack.yaml --outputs-dir ./outputs/r50_deformable_detr_motip_dancetrack/ --detr-checkpoint-frames 1
+  ```
+
+  
+
+</details>
+
+
 <details id="evaluation">
 <summary><strong>Evaluate the model</strong></summary>
 
