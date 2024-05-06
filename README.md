@@ -22,9 +22,11 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 ## News :fire:
 
-- <span style="font-variant-numeric: tabular-nums;">*2024.03.28*</span>: We release the inference code, you can evaluate the model following the [instructions](#evaluation) :tada:. Our model weights and logs are available in the [Google Drive](https://drive.google.com/drive/folders/1LTBWHLHhrF0Ro7fgCdAkgu9sJUV_y-vw?usp=drive_link) :cloud:.
+- <span style="font-variant-numeric: tabular-nums;">***2024.05.06***</span>: We release the training code and scripts :hugs:. The pre-training scripts will be released later :soon:. Now you can directly download pre-trained weights from the [Cloud :cloud:](https://drive.google.com/drive/folders/1O1HUxJJaDBORG6XEBk2QcWeXKqAblbxa?usp=drive_link).
 
-- <span style="font-variant-numeric: tabular-nums;">*2024.03.26*</span>: The paper is released on [arXiv](https://arxiv.org/abs/2403.16848), the code will be available in several days :soon:.
+- <span style="font-variant-numeric: tabular-nums;">***2024.03.28***</span>: We release the inference code, you can evaluate the model following the [instructions](#evaluation) :tada:. Our model weights and logs are available in the [Google Drive](https://drive.google.com/drive/folders/1LTBWHLHhrF0Ro7fgCdAkgu9sJUV_y-vw?usp=drive_link) :cloud:.
+
+- <span style="font-variant-numeric: tabular-nums;">***2024.03.26***</span>: The paper is released on [arXiv](https://arxiv.org/abs/2403.16848), the code will be available in several days :soon:.
 
 
 ## Main Results :chart_with_upwards_trend:
