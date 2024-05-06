@@ -72,7 +72,7 @@ SEED: 42
 USE_DISTRIBUTED: False
 DETR_NUM_TRAIN_FRAMES: 4
 # Below two parameters are for memory optimized DETR training:
-DETR_CHECKPOINT_FRAMES: 0
+DETR_CHECKPOINT_FRAMES: 5
 SEQ_DECODER_CHECKPOINT: False
 # Training Augmentation:
 TRAJ_DROP_RATIO: 0.5
