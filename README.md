@@ -26,7 +26,7 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 - <span style="font-variant-numeric: tabular-nums;">***2024.03.28***</span>: We release the inference code, you can evaluate the model following the [instructions](#evaluation) :tada:. Our model weights and logs are available in the [Google Drive](https://drive.google.com/drive/folders/1LTBWHLHhrF0Ro7fgCdAkgu9sJUV_y-vw?usp=drive_link) :cloud:.
 
-- <span style="font-variant-numeric: tabular-nums;">***2024.03.26***</span>: The paper is released on [arXiv](https://arxiv.org/abs/2403.16848), the code will be available in several days :soon:.
+- <span style="font-variant-numeric: tabular-nums;">***2024.03.26***</span>: The paper is released on [arXiv](https://arxiv.org/abs/2403.16848), ~~the code will be available in several days.~~ Welcome to watch our repository for the latest updates :pushpin:.
 
 
 ## Main Results :chart_with_upwards_trend:
@@ -166,18 +166,19 @@ For MOT17 and CrowdHuman, you can generate the ground-truth files by running the
 <summary><strong>Train MOTIP</strong></summary>
 
 - **Default training**:
+  
   ```bash
   python -m torch.distributed.run --nproc_per_node=8 main.py --mode train --use-distributed True --use-wandb False --config-path <config file path> --outputs-dir <outputs dir>
   ```
-
+  
   For example, you can train the model on DanceTrack as follows:
-
+  
   ```bash
   python -m torch.distributed.run --nproc_per_node=8 main.py --mode train --use-distributed True --use-wandb False --config-path ./configs/r50_deformable_detr_motip_dancetrack.yaml --outputs-dir ./outputs/r50_deformable_detr_motip_dancetrack/
   ```
-
+  
   Using this script, you can achieve 66.2 ~ 67.6 HOTA on DanceTrack test set. This relatively high instability (~ 1.5) is also encountered in other work (e.g., [OC-SORT](https://github.com/noahcao/OC_SORT), [MOTRv2](https://github.com/megvii-research/MOTRv2/issues/2), [MeMOTR](https://github.com/MCG-NJU/MeMOTR/issues/17)). We suggest that part of the reason comes from the DanceTrack dataset itself, because the final performance on the MOT17 or SportsMOT test set will be more stable (~ 0.2 HOTA and ~ 0.5 HOTA).
-
+  
 - **Training with gradient checkpoint**: <br>
   Using gradient checkpoint technique can reduce CUDA memory usage. You can use the parameter `--detr-checkpoint-frames` (< 4) to determine the number of frames processed at once, thereby running on GPUs with less than 24GB memory.
   For example, you can train the model on DanceTrack with 8 TITAN XP GPUs as follows:
@@ -195,6 +196,7 @@ For MOT17 and CrowdHuman, you can generate the ground-truth files by running the
 <summary><strong>Evaluate the model</strong></summary>
 
 - **Get tracking results for submitting**:
+  
   ```bash
   python -m torch.distributed.run --nproc_per_node=<gpu num> main.py --mode submit --use-distributed True --use-wandb False --config-path <config file path> --inference-model <checkpoint path> --outputs-dir <outputs dir> --inference-dataset <dataset name> --inference-split <dataset split>
   ```
