@@ -89,6 +89,10 @@ It directly predicts the ID labels for each object in the tracking process, whic
 - See [PRETRAIN.md](./docs/PRETRAIN.md) for how to get pretrained DETR weights.
 - See [GET_STARTED.md](./docs/GET_STARTED.md) for how to get started with our MOTIP.
 
+## :bouquet: Acknowledgements
+
+This project is built upon [Deformable DETR](https://github.com/fundamentalvision/Deformable-DETR), [MOTR](https://github.com/megvii-research/MOTR), [DAB-Deformable DETR](https://github.com/IDEA-Research/DAB-DETR), [TrackEval](https://github.com/JonathonLuiten/TrackEval). Thanks to the contributors of these great codebases.
+
 ## :pencil2: Citation
 
 If you think this project is helpful, please feel free to leave a :star: and cite our paper:
