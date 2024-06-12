@@ -10,7 +10,7 @@ This is the official PyTorch implementation of our paper:
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/multiple-object-tracking-as-id-prediction/multiple-object-tracking-on-sportsmot)](https://paperswithcode.com/sota/multiple-object-tracking-on-sportsmot?p=multiple-object-tracking-as-id-prediction)<br>
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/multiple-object-tracking-as-id-prediction/multi-object-tracking-on-mot17)](https://paperswithcode.com/sota/multi-object-tracking-on-mot17?p=multiple-object-tracking-as-id-prediction)<br>
 
-## Overview :mag:
+## :mag: Overview
 
 **TL; DR.** MOTIP proposes a new perspective to ***regard the multi-object tracking task as an ID prediction problem***. 
 It directly predicts the ID labels for each object in the tracking process, which is more straightforward and effective.
@@ -20,7 +20,7 @@ It directly predicts the ID labels for each object in the tracking process, whic
 **Abstract.** In Multiple Object Tracking (MOT), tracking-by-detection methods have stood the test for a long time, which split the process into two parts according to the definition: object detection and association. They leverage robust single-frame detectors and treat object association as a post-processing step through hand-crafted heuristic algorithms and surrogate tasks. However, the nature of heuristic techniques prevents end-to-end exploitation of training data, leading to increasingly cumbersome and challenging manual modification while facing complicated or novel scenarios. In this paper, we regard this object association task as an End-to-End in-context ID prediction problem and propose a streamlined baseline called MOTIP. Specifically, we form the target embeddings into historical trajectory information while considering the corresponding IDs as in-context prompts, then directly predict the ID labels for the objects in the current frame. Thanks to this end-to-end process, MOTIP can learn tracking capabilities straight from training data, freeing itself from burdensome hand-crafted algorithms. Without bells and whistles, our method achieves impressive state-of-the-art performance in complex scenarios like DanceTrack and SportsMOT, and it performs competitively with other transformer-based methods on MOT17. We believe that MOTIP demonstrates remarkable potential and can serve as a starting point for future research.
 
 
-## News :fire:
+## :fire: News
 
 - <span style="font-variant-numeric: tabular-nums;">***2024.05.06***</span>: We release the training code and scripts :hugs:. The pre-training scripts will be released later :soon:. Now you can directly download pre-trained weights from the [Cloud :cloud:](https://drive.google.com/drive/folders/1O1HUxJJaDBORG6XEBk2QcWeXKqAblbxa?usp=drive_link).
 
@@ -29,9 +29,9 @@ It directly predicts the ID labels for each object in the tracking process, whic
 - <span style="font-variant-numeric: tabular-nums;">***2024.03.26***</span>: The paper is released on [arXiv](https://arxiv.org/abs/2403.16848), ~~the code will be available in several days.~~ Welcome to watch our repository for the latest updates :pushpin:.
 
 
-## Main Results :chart_with_upwards_trend:
+## :chart_with_upwards_trend: ​Main Results
 
-### DanceTrack :dancer:
+### :dancer: ​DanceTrack
 
 | Method              | Training Data       | HOTA | DetA | AssA | MOTA | IDF1 | URLs                                                         |
 | ------------------- | ------------------- | ---- | ---- | ---- | ---- | ---- | ------------------------------------------------------------ |
@@ -50,7 +50,7 @@ It directly predicts the ID labels for each object in the tracking process, whic
 </details>
 
 
-### SportsMOT :basketball:
+### :basketball: ​SportsMOT
 
 | Method | Training Data      | HOTA | DetA | AssA | MOTA | IDF1 | URLs                                                         |
 | ------ | ------------------ | ---- | ---- | ---- | ---- | ---- | ------------------------------------------------------------ |
@@ -68,7 +68,7 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 
 
-### MOT17 :walking:
+### :walking: ​MOT17
 
 | Method | Training Data | HOTA | DetA | AssA | MOTA | IDF1 | URLs                                                         |
 | ------ | ------------- | ---- | ---- | ---- | ---- | ---- | ------------------------------------------------------------ |
@@ -82,127 +82,9 @@ It directly predicts the ID labels for each object in the tracking process, whic
 </details>
 
 
-## Quick Start :dash:
+## :dash: Quick Start
 
-<details>
-<summary><strong>Dependencies Install</strong></summary>
-
-```bash
-# Suggest python version >= 3.10
-conda create -n MOTIP python=3.11
-conda activate MOTIP
-# Now we only support pytorch version >= 2.0, we will support pytorch version <= 1.13 in the future
-conda install pytorch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 pytorch-cuda=11.8 -c pytorch -c nvidia
-# Other dependencies
-conda install matplotlib pyyaml scipy tqdm tensorboard seaborn scikit-learn pandas
-pip install opencv-python einops wandb pycocotools timm
-# Compile the Deformable Attention
-cd models/ops/
-sh make.sh
-```
-
-</details>
-
-
-
-
-<details>
-<summary><strong>Data Preparation</strong></summary>
-
-You can download the datasets from the following links:
-- [DanceTrack](https://github.com/DanceTrack/DanceTrack)
-- [SportsMOT](https://github.com/MCG-NJU/SportsMOT)
-- [MOT17](https://motchallenge.net/data/MOT17/)
-- [CrowdHuman](https://www.crowdhuman.org/)
-
-Then, you need to unzip and organize the data as follows:
-
-```
-DATADIR/
-  ├── DanceTrack/
-  │ ├── train/
-  │ ├── val/
-  │ ├── test/
-  │ ├── train_seqmap.txt
-  │ ├── val_seqmap.txt
-  │ └── test_seqmap.txt
-  ├── SportsMOT/
-  │ ├── train/
-  │ ├── val/
-  │ ├── test/
-  │ ├── train_seqmap.txt
-  │ ├── val_seqmap.txt
-  │ └── test_seqmap.txt
-  ├── MOT17/
-  │ ├── images/
-  │ │ ├── train/     # unzip from MOT17
-  │ │ └── test/      # unzip from MOT17
-  │ └── gts/
-  │   └── train/     # generate by ./data/gen_mot17_gts.py
-  └── CrowdHuman/
-    ├── images/
-    │ ├── train/     # unzip from CrowdHuman
-    │ └── val/       # unzip from CrowdHuman
-    └── gts/
-      ├── train/     # generate by ./data/gen_crowdhuman_gts.py
-      └── val/       # generate by ./data/gen_crowdhuman_gts.py
-```
-
-For MOT17 and CrowdHuman, you can generate the ground-truth files by running the corresponding scripts [gen_mot17_gts.py](./data/gen_mot17_gts.py) and [gen_crowdhuman_gts.py](./data/gen_crowdhuman_gts.py).
-
-</details>
-
-
-<details id="pretrain">
-<summary><strong>Pre-train DETR</strong></summary>
-<i>TBD</i> :soon:
-
-:floppy_disk: ***You can also download the pre-trained weights from [Google Drive :cloud:](https://drive.google.com/drive/folders/1O1HUxJJaDBORG6XEBk2QcWeXKqAblbxa?usp=drive_link), and then put them into ./pretrains/ directory.***
-
-</details>
-
-
-<details id="train">
-<summary><strong>Train MOTIP</strong></summary>
-
-- **Default training**:
-  
-  ```bash
-  python -m torch.distributed.run --nproc_per_node=8 main.py --mode train --use-distributed True --use-wandb False --config-path <config file path> --outputs-dir <outputs dir>
-  ```
-  
-  For example, you can train the model on DanceTrack as follows:
-  
-  ```bash
-  python -m torch.distributed.run --nproc_per_node=8 main.py --mode train --use-distributed True --use-wandb False --config-path ./configs/r50_deformable_detr_motip_dancetrack.yaml --outputs-dir ./outputs/r50_deformable_detr_motip_dancetrack/
-  ```
-  
-  Using this script, you can achieve 66.2 ~ 67.6 HOTA on DanceTrack test set. This relatively high instability (~ 1.5) is also encountered in other work (e.g., [OC-SORT](https://github.com/noahcao/OC_SORT), [MOTRv2](https://github.com/megvii-research/MOTRv2/issues/2), [MeMOTR](https://github.com/MCG-NJU/MeMOTR/issues/17)). We suggest that part of the reason comes from the DanceTrack dataset itself, because the final performance on the MOT17 or SportsMOT test set will be more stable (~ 0.2 HOTA and ~ 0.5 HOTA).
-  
-- **Training with gradient checkpoint**: <br>
-  Using gradient checkpoint technique can reduce CUDA memory usage. You can use the parameter `--detr-checkpoint-frames` (< 4) to determine the number of frames processed at once, thereby running on GPUs with less than 24GB memory.
-  For example, you can train the model on DanceTrack with 8 TITAN XP GPUs as follows:
-
-  ```bash
-  python -m torch.distributed.run --nproc_per_node=8 main.py --mode train --use-distributed True --use-wandb False --config-path ./configs/r50_deformable_detr_motip_dancetrack.yaml --outputs-dir ./outputs/r50_deformable_detr_motip_dancetrack/ --detr-checkpoint-frames 1
-  ```
-
-  
-
-</details>
-
-
-<details id="evaluation">
-<summary><strong>Evaluate the model</strong></summary>
-
-- **Get tracking results for submitting**:
-  
-  ```bash
-  python -m torch.distributed.run --nproc_per_node=<gpu num> main.py --mode submit --use-distributed True --use-wandb False --config-path <config file path> --inference-model <checkpoint path> --outputs-dir <outputs dir> --inference-dataset <dataset name> --inference-split <dataset split>
-  ```
-  For example, you can submit the model on DanceTrack test set as follows:
-  ```bash
-  python -m torch.distributed.run --nproc_per_node=8 main.py --mode submit --use-distributed True --use-wandb False --config-path ./configs/r50_deformable_detr_motip_dancetrack.yaml --inference-model ./outputs/r50_deformable_detr_motip_dancetrack.pth --outputs-dir ./outputs/dancetrack_trackers/ --inference-dataset DanceTrack --inference-split test
-  ```
-
-</details>
+- See [INSTALL.md](./docs/INSTALL.md) for instructions of installing required components.
+- See [DATASET.md](./docs/DATASET.md) for datasets download and preparation.
+- See [PRETRAIN.md](./docs/PRETRAIN.md) for how to get pretrained DETR weights.
+- See [GET_STARTED.md](./docs/GET_STARTED.md) for how to get started with our MOTIP.
