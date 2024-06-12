@@ -88,3 +88,17 @@ It directly predicts the ID labels for each object in the tracking process, whic
 - See [DATASET.md](./docs/DATASET.md) for datasets download and preparation.
 - See [PRETRAIN.md](./docs/PRETRAIN.md) for how to get pretrained DETR weights.
 - See [GET_STARTED.md](./docs/GET_STARTED.md) for how to get started with our MOTIP.
+
+## :pencil2: Citation
+
+If you think this project is helpful, please feel free to leave a :star: and cite our paper:
+
+```tex
+@article{MOTIP,
+  title={Multiple Object Tracking as ID Prediction},
+  author={Gao, Ruopeng and Zhang, Yijun and Wang, Limin},
+  journal={arXiv preprint arXiv:2403.16848},
+  year={2024}
+}
+```
+
