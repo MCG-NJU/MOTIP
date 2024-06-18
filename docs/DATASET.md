@@ -36,7 +36,7 @@ For the MOT17 and CrowdHuman datasets, you’ll need to use the provided script 
   │ └── test_seqmap.txt
   ├── MOT17/
   │ ├── images/
-  │ │ ├── train/     # unzip from MOT17
+  │ │ ├── train/     # unzip from MOT17, you need to delete some files, see the below the instructions
   │ │ └── test/      # unzip from MOT17
   │ └── gts/
   │   └── train/     # generate by ./data/gen_mot17_gts.py
@@ -48,6 +48,8 @@ For the MOT17 and CrowdHuman datasets, you’ll need to use the provided script 
       ├── train/     # generate by ./data/gen_crowdhuman_gts.py
       └── val/       # generate by ./data/gen_crowdhuman_gts.py
 ```
+
+:warning: Since each video sequence in MOT17 is stored three times, for each training video sequence, you should delete the other two sequences to achieve deduplication. For instance, in my experiment, I only retained the ‘xxx-DPM’ sequences.”
 
 ## Q & A
 
