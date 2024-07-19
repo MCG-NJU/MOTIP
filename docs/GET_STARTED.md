@@ -22,6 +22,10 @@ python -m torch.distributed.run --nproc_per_node=8 main.py --mode train --use-di
 
 Using this script, you can achieve 66.2 ~ 67.6 HOTA on DanceTrack test set. This relatively high instability (~ 1.5) is also encountered in other work (e.g., [OC-SORT](https://github.com/noahcao/OC_SORT), [MOTRv2](https://github.com/megvii-research/MOTRv2/issues/2), [MeMOTR](https://github.com/MCG-NJU/MeMOTR/issues/17)). We suggest that part of the reason comes from the DanceTrack dataset itself, because the final performance on the MOT17 or SportsMOT test set will be more stable (~ 0.2 HOTA and ~ 0.5 HOTA).
 
+### Gradient Checkpoint
+
+If your GPUs have less than 24GB CUDA memory, we offer the gradient checkpoint technology. You can set `--detr-checkpoint-frames` to `2` (< 16GB) or `1` (< 12GB) to reduce the CUDA memory requirements.
+
 ## Inference
 
 ### Submitting
