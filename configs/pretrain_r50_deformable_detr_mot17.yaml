@@ -1,0 +1,32 @@
+SUPER_CONFIG_PATH: ./configs/r50_deformable_detr_motip_mot17.yaml
+
+DATASETS: [MOT17, CrowdHuman, CrowdHuman]
+DATASET_SPLITS: [train, train, val]
+DATASET_WEIGHTS: [1, 2, 2]            # Different weights for different datasets
+
+SAMPLE_LENGTHS: [1]                   # Only sampling one frame for detection
+
+# Pre-training in a smaller resolution:
+AUG_RESIZE_SCALES: [480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800]
+AUG_MAX_SIZE: 1333
+AUG_RANDOM_RESIZE: [400, 500, 600]
+AUG_RANDOM_CROP_MIN: 384
+AUG_RANDOM_CROP_MAX: 600
+INFERENCE_MAX_SIZE: 1333
+
+DETR_PRETRAIN: ./pretrains/r50_deformable_detr_coco.pth   # Pretrain from COCO checkpoint
+DETR_NUM_TRAIN_FRAMES: 100                                # >> BS
+
+# Train Setting:
+TRAIN_STAGE: only_detr
+EPOCHS: 120
+LR: 2.0e-4
+LR_WARMUP_EPOCHS: 0
+SCHEDULER_MILESTONES: [80, ]
+SCHEDULER_GAMMA: 0.1
+BATCH_SIZE: 4
+ACCUMULATE_STEPS: 1
+
+# Eval:
+INFERENCE_ONLY_DETR: True
+SAVE_CHECKPOINT_PER_EPOCH: 5
