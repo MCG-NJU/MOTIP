@@ -88,6 +88,7 @@ It directly predicts the ID labels for each object in the tracking process, whic
 - See [DATASET.md](./docs/DATASET.md) for datasets download and preparation.
 - See [PRETRAIN.md](./docs/PRETRAIN.md) for how to get pretrained DETR weights.
 - See [GET_STARTED.md](./docs/GET_STARTED.md) for how to get started with our MOTIP.
+- See [MISCELLANEOUS.md](./docs/MISCELLANEOUS.md) for other miscellaneous settings unrelated to the model structure, such as logging.
 
 ## :bouquet: Acknowledgements
 
