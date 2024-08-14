@@ -119,6 +119,13 @@ def main(config: dict):
     """
     os.environ["CUDA_VISIBLE_DEVICES"] = config["AVAILABLE_GPUS"]   # setting available gpus, like: "0,1,2,3"
 
+    _not_use_tf32 = False if "USE_TF32" not in config else not config["USE_TF32"]
+    if _not_use_tf32:
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
+        if is_main_process():
+            print("Not use TF32 on Ampere GPUs.")
+
     if config["USE_DISTRIBUTED"]:
         # https://i.steer.space/blog/2021/01/pytorch-dist-nccl-backend-allgather-stuck
         torch.distributed.init_process_group("nccl")
