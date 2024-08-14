@@ -121,7 +121,7 @@ USE_WANDB: True
 PROJECT_NAME: MOTIP
 EXP_NAME: r50_deformable_detr_motip_dancetrack
 EXP_GROUP: default
-EXP_OWNER: hellorpg
+EXP_OWNER:
 
 # Settings which are used to reduce the memory usage of DETR criterion.
 # Too many objects (such as CrowdHuman) may cause OOM error.
