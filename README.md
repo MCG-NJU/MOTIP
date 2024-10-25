@@ -107,3 +107,6 @@ If you think this project is helpful, please feel free to leave a :star: and cit
 }
 ```
 
+## :star2: Stars
+
+[![Star History Chart](https://api.star-history.com/svg?repos=MCG-NJU/MOTIP&type=Date)](https://star-history.com/#MCG-NJU/MOTIP&Date)
