@@ -22,13 +22,15 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 ## :fire: News
 
+- <span style="font-variant-numeric: tabular-nums;">***2025.03.25***</span>: Our revised paper is released at [arXiv:2403.16848](https://arxiv.org/abs/2403.16848). The current codebase aligns with the results of the previous version of our paper, at [arXiv:2403.16848v1](https://arxiv.org/abs/2403.16848v1). The latest codebase is being organized :construction:.
+
 - <span style="font-variant-numeric: tabular-nums;">***2025.02.27***</span>: Our paper is accepted by CVPR 2025 :tada: :tada:. The revised paper and a more efficient codebase will be released in March. Almost there :nerd_face: ~
 
 - <span style="font-variant-numeric: tabular-nums;">***2024.05.06***</span>: We release the training code and scripts :hugs:. The pre-training scripts will be released later :soon:. Now you can directly download pre-trained weights from the [Cloud :cloud:](https://drive.google.com/drive/folders/1O1HUxJJaDBORG6XEBk2QcWeXKqAblbxa?usp=drive_link).
 
 - <span style="font-variant-numeric: tabular-nums;">***2024.03.28***</span>: We release the inference code, you can evaluate the model following the [instructions](#evaluation) :tada:. Our model weights and logs are available in the [Google Drive](https://drive.google.com/drive/folders/1LTBWHLHhrF0Ro7fgCdAkgu9sJUV_y-vw?usp=drive_link) :cloud:.
 
-- <span style="font-variant-numeric: tabular-nums;">***2024.03.26***</span>: The paper is released on [arXiv](https://arxiv.org/abs/2403.16848), ~~the code will be available in several days.~~ Welcome to watch our repository for the latest updates :pushpin:.
+- <span style="font-variant-numeric: tabular-nums;">***2024.03.26***</span>: The paper is released on [arXiv](https://arxiv.org/abs/2403.16848). Welcome to watch our repository for the latest updates :pushpin:.
 
 
 ## :chart_with_upwards_trend: ​Main Results
