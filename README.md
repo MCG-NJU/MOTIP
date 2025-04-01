@@ -22,6 +22,8 @@ It directly predicts the ID labels for each object in the tracking process, whic
 
 ## :fire: News
 
+- <span style="font-variant-numeric: tabular-nums;">***2025.04.02***</span>: **This branch, built on the previous training and inference engine, is no longer maintained :no_entry:.** Please use the [main branch](https://github.com/MCG-NJU/MOTIP) for the latest updates.
+
 - <span style="font-variant-numeric: tabular-nums;">***2025.03.25***</span>: Our revised paper is released at [arXiv:2403.16848](https://arxiv.org/abs/2403.16848). The current codebase aligns with the results of the previous version of our paper, at [arXiv:2403.16848v1](https://arxiv.org/abs/2403.16848v1). The latest codebase is being organized :construction:.
 
 - <span style="font-variant-numeric: tabular-nums;">***2025.02.27***</span>: Our paper is accepted by CVPR 2025 :tada: :tada:. The revised paper and a more efficient codebase will be released in March. Almost there :nerd_face: ~
