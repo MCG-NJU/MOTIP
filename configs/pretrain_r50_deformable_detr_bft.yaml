@@ -1,0 +1,20 @@
+SUPER_CONFIG_PATH: ./configs/r50_deformable_detr_motip_bft.yaml
+
+SAMPLE_LENGTHS: [1, ]   # Only One Frame Detection
+
+DETR_PRETRAIN: ./pretrains/r50_deformable_detr_coco.pth   # Pretrain from COCO checkpoint
+DETR_NUM_TRAIN_FRAMES: 100                                # >> BS
+
+ONLY_DETR: True
+
+# Training Strategies:
+EPOCHS: 60
+LR: 1.0e-4
+LR_WARMUP_EPOCHS: 0
+SCHEDULER_MILESTONES: [45, ]
+SCHEDULER_GAMMA: 0.1
+BATCH_SIZE: 2
+ACCUMULATE_STEPS: 1
+
+SAVE_CHECKPOINT_PER_EPOCH: 5
+
