@@ -407,7 +407,7 @@ def train_one_epoch(
         detr_outputs = tensor_dict_index_select(detr_outputs, index=go_back_frame_idxs_flatten, dim=0)
 
         # DETR criterion:
-        detr_loss_dict, detr_indices = detr_criterion(outputs=detr_outputs, targets=detr_targets_flatten, batch_len=4)
+        detr_loss_dict, detr_indices = detr_criterion(outputs=detr_outputs, targets=detr_targets_flatten, batch_len=10)
 
         # Whether to only train the DETR, OR to train the MOTIP together:
         if not only_detr:
