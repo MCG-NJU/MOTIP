@@ -113,8 +113,13 @@ class MSDeformAttn(nn.Module):
         # for amp
         if value.dtype == torch.float16:
             # for mixed precision
+            # output = MSDeformAttnFunction.apply(
+            #     value.to(torch.float32), input_spatial_shapes, input_level_start_index, sampling_locations.to(torch.float32), attention_weights, self.im2col_step
+            # )
             output = MSDeformAttnFunction.apply(
-            value.to(torch.float32), input_spatial_shapes, input_level_start_index, sampling_locations.to(torch.float32), attention_weights, self.im2col_step)
+                value.to(torch.float32), input_spatial_shapes, input_level_start_index,
+                sampling_locations.to(torch.float32), attention_weights.to(torch.float32), self.im2col_step
+            )
             output = output.to(torch.float16)
             output = self.output_proj(output)
             return output

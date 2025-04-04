@@ -16,12 +16,14 @@ class SeqDataset(Dataset):
             max_shorter: int = 800,
             max_longer: int = 1536,
             size_divisibility: int = 0,
+            dtype=torch.float32,
     ):
         self.seq_info = seq_info
         self.image_paths = image_paths
         self.max_shorter = max_shorter
         self.max_longer = max_longer
         self.size_divisibility = size_divisibility
+        self.dtype = dtype
 
         self.transform = v2.Compose([
             v2.Resize(size=self.max_shorter, max_size=self.max_longer),
@@ -37,6 +39,8 @@ class SeqDataset(Dataset):
     def __getitem__(self, item):
         image = self._load(self.image_paths[item])
         transformed_image = self.transform(image)
+        if self.dtype != torch.float32:
+            transformed_image = transformed_image.to(self.dtype)
         transformed_image = nested_tensor_from_tensor_list([transformed_image], self.size_divisibility)
         return transformed_image, self.image_paths[item]
 

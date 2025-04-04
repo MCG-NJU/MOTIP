@@ -48,7 +48,7 @@ class IDDecoder(nn.Module):
 
         # Related Position Embeddings:
         self.rel_pos_embeds = nn.Parameter(
-            torch.zeros((self.num_layers, self.rel_pe_length, self.n_heads), dtype=torch.float)
+            torch.zeros((self.num_layers, self.rel_pe_length, self.n_heads), dtype=torch.float32)
         )
         # Prepare others for rel pe:
         t_idxs = torch.arange(self.rel_pe_length, dtype=torch.int64)
@@ -134,12 +134,12 @@ class IDDecoder(nn.Module):
             cross_attn_key_padding_mask.float(),
             mask=cross_attn_key_padding_mask,
             value=float("-inf"),
-        )
+        ).to(self.dtype)
         cross_attn_mask = torch.masked_fill(
             cross_attn_mask.float(),
             mask=cross_attn_mask,
             value=float("-inf"),
-        )
+        ).to(self.dtype)
         pass
 
         all_unknown_id_logits = None
@@ -230,7 +230,7 @@ class IDDecoder(nn.Module):
         return unknown_embeds
 
     def id_label_to_embed(self, id_labels):
-        id_words = label_to_one_hot(id_labels, self.num_id_vocabulary + 1)
+        id_words = label_to_one_hot(id_labels, self.num_id_vocabulary + 1, dtype=self.dtype)
         id_embeds = self.word_to_embed(id_words)
         return id_embeds
 
@@ -246,3 +246,7 @@ class IDDecoder(nn.Module):
         self.word_to_embed.weight.data = self.word_to_embed.weight.data[:, shuffle_index]
         self.embed_to_word.weight.data = self.embed_to_word.weight.data[shuffle_index, :]
         pass
+
+    @property
+    def dtype(self):
+        return self.word_to_embed.weight.dtype

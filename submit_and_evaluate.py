@@ -93,6 +93,7 @@ def submit_and_evaluate(config: dict):
         area_thresh=config.get("AREA_THRESH", 0),
         inference_only_detr=config["INFERENCE_ONLY_DETR"] if config["INFERENCE_ONLY_DETR"] is not None
         else config["ONLY_DETR"],
+        dtype=config.get("INFERENCE_DTYPE", "FP32"),
     )
 
     if metrics is not None:
@@ -129,6 +130,7 @@ def submit_and_evaluate_one_model(
         id_thresh: float = 0.1,
         area_thresh: int = 0,
         inference_only_detr: bool = False,
+        dtype: str = "FP32",
 ):
     # Build the datasets:
     inference_dataset = dataset_classes[dataset](
@@ -136,6 +138,11 @@ def submit_and_evaluate_one_model(
         split=data_split,
         load_annotation=False,
     )
+    # Set the dtype during inference:
+    match dtype:
+        case "FP32": dtype=torch.float32
+        case "FP16": dtype=torch.float16
+        case _: raise ValueError(f"Unknown dtype '{dtype}'.")
     # Filter out the sequences that will not be processed in this GPU (if we have multiple GPUs):
     _inference_sequence_names = list(inference_dataset.sequence_infos.keys())
     _inference_sequence_names.sort()
@@ -170,6 +177,7 @@ def submit_and_evaluate_one_model(
             max_shorter=image_max_shorter,
             max_longer=image_max_longer,
             size_divisibility=size_divisibility,
+            dtype=dtype,
         )
         sequence_loader = DataLoader(
             dataset=sequence_dataset,
@@ -192,6 +200,7 @@ def submit_and_evaluate_one_model(
             id_thresh=id_thresh,
             area_thresh=area_thresh,
             only_detr=inference_only_detr,
+            dtype=dtype,
         )
         if is_fake:
             logger.info(

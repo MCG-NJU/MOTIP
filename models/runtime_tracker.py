@@ -33,6 +33,13 @@ class RuntimeTracker:
 
         self.dtype = dtype
 
+        # For FP16:
+        if self.dtype != torch.float32:
+            if self.dtype == torch.float16:
+                self.model.half()
+            else:
+                raise NotImplementedError(f"Unsupported dtype {self.dtype}.")
+
         self.use_sigmoid = use_sigmoid
         self.assignment_protocol = assignment_protocol.lower()
         self.miss_tolerance = miss_tolerance
@@ -49,7 +56,7 @@ class RuntimeTracker:
 
         self.bbox_unnorm = torch.tensor(
             [sequence_hw[1], sequence_hw[0], sequence_hw[1], sequence_hw[0]],
-            dtype=torch.float32,
+            dtype=dtype,
             device=distributed_device(),
         )
 

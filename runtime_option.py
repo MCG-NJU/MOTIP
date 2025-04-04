@@ -80,6 +80,7 @@ def runtime_option():
     parser.add_argument("--inference-split", type=str)
     parser.add_argument("--inference-group", type=str)
     parser.add_argument("--inference-max-longer", type=int)
+    parser.add_argument("--inference-dtype", type=str)
     parser.add_argument("--assignment-protocol", type=str)
     parser.add_argument("--miss-tolerance", type=int)
     parser.add_argument("--det-thresh", type=float)

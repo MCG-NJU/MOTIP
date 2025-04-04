@@ -71,7 +71,7 @@ We have two different inference modes:
 1. Without ground truth annotations (e.g. DanceTrack test, SportsMOT test), [submission scripts](#Submission) can generate tracker files for submission.
 2. With ground truth annotations, [evaluation scripts](#Evaluation) can produce tracking results and obtain evaluation results.
 
-Different inference behaviors are controlled by the runtime parameter `--inference-mode`.
+:pushpin: **Different inference behaviors are controlled by the runtime parameter `--inference-mode`.**
 
 ### Submission
 
@@ -87,6 +87,8 @@ For example, you can get our default results on the DanceTrack test set as follo
 accelerate launch --num_processes=8 submit_and_evaluate.py --data-root ./datasets/ --inference-mode submit --config-path ./configs/r50_deformable_detr_motip_dancetrack.yaml --inference-model ./outputs/r50_deformable_detr_motip_dancetrack/r50_deformable_detr_motip_dancetrack.pth --outputs-dir ./outputs/r50_deformable_detr_motip_dancetrack/ --inference-dataset DanceTrack --inference-split test
 ```
 
+:racing_car: You can add `--inference-dtype FP16` to the script to use float16 for inference. This can improve inference speed by over 30% with only a slight impact on tracking performance (about 0.5 HOTA).
+
 ### Evaluation
 
 You can obtain both the tracking results (tracker files) and evaluation results using the following **template script**:
@@ -100,5 +102,3 @@ For example, you can get the evaluation results on the DanceTrack val set as fol
 ```shell
 accelerate launch --num_processes=8 submit_and_evaluate.py --data-root ./datasets/ --inference-mode evaluate --config-path ./configs/r50_deformable_detr_motip_dancetrack.yaml --inference-model ./outputs/r50_deformable_detr_motip_dancetrack/r50_deformable_detr_motip_dancetrack.pth --outputs-dir ./outputs/r50_deformable_detr_motip_dancetrack/ --inference-dataset DanceTrack --inference-split val
 ```
-
-### 

@@ -21,8 +21,8 @@ def pos_to_pos_embed(pos, num_pos_feats: int = 64, temperature: int = 10000, sca
     return pos_embed
 
 
-def label_to_one_hot(labels: torch.Tensor, n_classes: int):
-    one_hot = torch.eye(n=n_classes, device=labels.device)[labels]
+def label_to_one_hot(labels: torch.Tensor, n_classes: int, dtype=torch.float32):
+    one_hot = torch.eye(n=n_classes, device=labels.device, dtype=dtype)[labels]
     return one_hot
 
 

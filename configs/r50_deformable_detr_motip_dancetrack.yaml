@@ -120,6 +120,7 @@ INFERENCE_SPLIT: val
 INFERENCE_MODE: evaluate    # evaluate or submit
 INFERENCE_GROUP: default    # group name for inference
 INFERENCE_MAX_LONGER: 1440  # max longer size for inference
+INFERENCE_DTYPE: FP32
 #ASSIGNMENT_PROTOCOL: hungarian
 ASSIGNMENT_PROTOCOL: object-max
 MISS_TOLERANCE: 30          # tolerance for missing frames
