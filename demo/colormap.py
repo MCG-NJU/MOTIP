@@ -98,4 +98,3 @@ def colormap(rgb=False):
     if not rgb:
         color_list = color_list[:, ::-1]
     return color_list
-

@@ -15,7 +15,7 @@ This is the official PyTorch implementation of our paper:
 
 ## :fire: News
 
-- <span style="font-variant-numeric: tabular-nums;">**2025.04.06**</span>: Now, you can use the [video process demo](./demo/video_process.ipynb) to perform nearly real-time tracking on your video :joystick:.
+- <span style="font-variant-numeric: tabular-nums;">**2025.04.06**</span>: Now, you can use the [video process demo](./demo/video_process.ipynb) to perform nearly real-time tracking on your videos :joystick:.
 - <span style="font-variant-numeric: tabular-nums;">**2025.04.05**</span>: We support FP16 for faster inference :racing_car:.
 - <span style="font-variant-numeric: tabular-nums;">**2025.04.03**</span>: The new codebase is released :tada:. Compared to the previous version, it is more concise and efficient :rocket:. Feel free to enjoy it!
 - <span style="font-variant-numeric: tabular-nums;">**2025.03.25**</span>: Our revised paper is released at [arXiv:2403.16848](https://arxiv.org/abs/2403.16848). The latest codebase is being organized :construction:.
