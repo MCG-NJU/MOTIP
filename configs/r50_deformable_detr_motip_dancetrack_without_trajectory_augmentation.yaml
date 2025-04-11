@@ -1,0 +1,4 @@
+SUPER_CONFIG_PATH: ./configs/r50_deformable_detr_motip_dancetrack.yaml
+
+AUG_TRAJECTORY_OCCLUSION_PROB: 0.0
+AUG_TRAJECTORY_SWITCH_PROB: 0.0
