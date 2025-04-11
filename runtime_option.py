@@ -107,4 +107,6 @@ def runtime_option():
     parser.add_argument("--git-version", type=str)
     parser.add_argument("--save-checkpoint-per-epoch", type=int)
 
+    parser.add_argument("--use-previous-checkpoint", type=str)
+
     return parser.parse_args()

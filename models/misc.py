@@ -179,3 +179,71 @@ def _get_clones(module, N):
 
 def get_model(model):
     return model.module if is_distributed() else model
+
+# For previous version of MOTIP models:
+def load_previous_checkpoint(model, path, states=None, optimizer=None, scheduler=None):
+    assert states is None and optimizer is None and scheduler is None, \
+        "The states, optimizer, and scheduler should be None for the previous version of MOTIP models."
+
+    load_state = torch.load(path, map_location=lambda storage, loc: storage)
+    model_state = load_state["model"]
+    transfer_states = dict()
+
+    if "bbox_embed.0.layers.0.weight" in model_state:
+        load_detr_pretrain(model=model, pretrain_path=path, num_classes=None)
+        return
+    else:
+        for k, v in model_state.items():
+            if "detr" in k:
+                transfer_states[k] = v
+            elif "seq_decoder" in k:
+                transfer_k = k
+                transfer_k = transfer_k.replace("seq_decoder.", "")
+                if "trajectory_feature_adapter" in transfer_k:
+                    transfer_k = transfer_k.replace("trajectory_feature_adapter", "trajectory_modeling.adapter")
+                    if "norm" in transfer_k:
+                        transfer_k = transfer_k.replace("adapter.", "")
+                elif "trajectory_augmentation" in transfer_k:
+                    transfer_k = transfer_k.replace("trajectory_augmentation.trajectory_ffn", "trajectory_modeling.ffn")
+                    if "ffn.norm" in transfer_k:
+                        transfer_k = transfer_k.replace("ffn.norm", "ffn_norm")
+                elif "related_temporal_embeds" in transfer_k:
+                    transfer_k = transfer_k.replace("related_temporal_embeds", "rel_pos_embeds")
+                elif "embed_to_word" in transfer_k:
+                    for _ in range(0, 6):
+                        _transfer_k = transfer_k
+                        _transfer_k = _transfer_k.replace("embed_to_word", f"embed_to_word_layers.{_}")
+                        if _transfer_k in transfer_states:
+                            print(f"Key '{_transfer_k}' is already in the transfer states.")
+                        transfer_states[_transfer_k] = v
+                    continue
+                elif "decoder_layers" in transfer_k:
+                    transfer_k = transfer_k.replace("decoder_layers", "cross_attn_layers")
+                elif ".norm_layers" in transfer_k:
+                    transfer_k = transfer_k.replace("norm_layers", "cross_attn_norm_layers")
+                elif "self_attn_layers" in transfer_k:
+                    pass
+                elif "self_norm_layers" in transfer_k:
+                    transfer_k = transfer_k.replace("self_norm_layers", "self_attn_norm_layers")
+                elif "ffn_layers" in transfer_k:
+                    if "norm" in transfer_k:
+                        transfer_k = transfer_k.replace("ffn_layers", "ffn_norm_layers")
+                        transfer_k = transfer_k.replace("norm.", "")
+                        pass
+                else:
+                    pass
+                if transfer_k in transfer_states:
+                    print(f"Key '{transfer_k}' is already in the transfer states.")
+                transfer_states[transfer_k] = v
+                pass
+            else:
+                pass
+        model.load_state_dict(transfer_states)
+
+    if optimizer is not None:
+        optimizer.load_state_dict(load_state["optimizer"])
+    if scheduler is not None:
+        scheduler.load_state_dict(load_state["scheduler"])
+    if states is not None:
+        states.update(load_state["states"])
+    return

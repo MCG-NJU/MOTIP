@@ -68,7 +68,12 @@ def submit_and_evaluate(config: dict):
 
     model, _ = build_motip(config=config)
 
-    load_checkpoint(model, path=config["INFERENCE_MODEL"])
+    use_previous_checkpoint = config.get("USE_PREVIOUS_CHECKPOINT", False)
+    if not use_previous_checkpoint:
+        load_checkpoint(model, path=config["INFERENCE_MODEL"])
+    else:
+        from models.misc import load_previous_checkpoint
+        load_previous_checkpoint(model, path=config["INFERENCE_MODEL"])
 
     model = accelerator.prepare(model)
 
