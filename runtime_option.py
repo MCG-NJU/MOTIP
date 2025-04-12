@@ -62,6 +62,7 @@ def runtime_option():
     parser.add_argument("--aug-trajectory-switch-prob", type=float)
     parser.add_argument("--detr-num-train-frames", type=int)
     parser.add_argument("--detr-num-checkpoint-frames", type=int)
+    parser.add_argument("--detr-criterion-batch-len", type=int)
     parser.add_argument("--use-decoder-checkpoint", type=str)
     parser.add_argument("--use-aux-loss", type=str)
     parser.add_argument("--use-shared-aux-head", type=str)

@@ -177,6 +177,7 @@ def train_engine(config: dict):
             lr_warmup_tgt_lr=config["LR"],
             detr_num_train_frames=config["DETR_NUM_TRAIN_FRAMES"],
             detr_num_checkpoint_frames=config["DETR_NUM_CHECKPOINT_FRAMES"],
+            detr_criterion_batch_len=config.get("DETR_CRITERION_BATCH_LEN", 10),
             use_decoder_checkpoint=config["USE_DECODER_CHECKPOINT"],
             accumulate_steps=config["ACCUMULATE_STEPS"],
             separate_clip_norm=config.get("SEPARATE_CLIP_NORM", True),
@@ -272,6 +273,7 @@ def train_one_epoch(
         lr_warmup_tgt_lr: float,
         detr_num_train_frames: int,
         detr_num_checkpoint_frames: int,
+        detr_criterion_batch_len: int,
         use_decoder_checkpoint: bool,
         accumulate_steps: int = 1,
         separate_clip_norm: bool = True,
@@ -407,7 +409,7 @@ def train_one_epoch(
         detr_outputs = tensor_dict_index_select(detr_outputs, index=go_back_frame_idxs_flatten, dim=0)
 
         # DETR criterion:
-        detr_loss_dict, detr_indices = detr_criterion(outputs=detr_outputs, targets=detr_targets_flatten, batch_len=10)
+        detr_loss_dict, detr_indices = detr_criterion(outputs=detr_outputs, targets=detr_targets_flatten, batch_len=detr_criterion_batch_len)
 
         # Whether to only train the DETR, OR to train the MOTIP together:
         if not only_detr:
