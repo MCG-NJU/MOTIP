@@ -27,6 +27,7 @@
 
 1. *Traj Aug* is an abbreviation for *Trajectory Augmentation* in the paper.
 1. You could also load previous checkpoints for inference from [prev-engine branch](https://github.com/MCG-NJU/MOTIP/tree/prev-engine), using runtime parameter `--use-previous-checkpoint True`. You may need to pass additional parameters to bridge the difference in the experimental setups. Typically, `--rel-pe-length` and `--miss-tolerance`.
+1. We present some experimental results not included in the paper, which we plan to discuss in the extended version of the article :soon:.
 
 ## DETR
 
