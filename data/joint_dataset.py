@@ -2,6 +2,7 @@
 # No matter how many datasets you used in your code,
 # you should always use JointDataset to combine and organize them (even if you only used one dataset).
 
+import copy
 import torch
 from collections import defaultdict
 from torch.utils.data import Dataset
@@ -159,8 +160,8 @@ class JointDataset(Dataset):
         # Do some modifications:
         metas[0]["is_begin"] = True     # the first frame is the beginning of a video clip
         # Deep copy:
-        annotations = [annotation.copy() for annotation in annotations]
-        metas = [meta.copy() for meta in metas]
+        annotations = [copy.deepcopy(annotation) for annotation in annotations]
+        metas = [copy.deepcopy(meta) for meta in metas]
 
         # Apply transforms:
         if self.transforms is not None:
