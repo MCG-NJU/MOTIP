@@ -14,10 +14,10 @@ from .bft import BFT
 
 
 dataset_classes = {
-    "DanceTrack": DanceTrack,
-    "SportsMOT": SportsMOT,
+    #"DanceTrack": DanceTrack,
+    #"SportsMOT": SportsMOT,
     "CrowdHuman": CrowdHuman,
-    "BFT": BFT,
+    #"BFT": BFT,
 }
 
 

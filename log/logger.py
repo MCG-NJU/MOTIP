@@ -13,6 +13,8 @@ from log.log import Metrics
 from utils.misc import is_main_process
 from accelerate.state import PartialState
 from data.joint_dataset import JointDataset
+from torch.utils.tensorboard import SummaryWriter
+import mlflow
 
 
 state = PartialState()
@@ -52,11 +54,15 @@ class Logger:
             self,
             logdir: str,
             use_wandb: bool,
+            use_tensorboard: bool = False,
+            use_mlflow: bool = False,
             config: dict | None = None,       # log to wandb
             exp_owner: str | None = None,
             exp_project: str | None = None,
             exp_group: str | None = None,
             exp_name: str | None = None,
+            tb_comment: str | None = None,
+            mlflow_tracking_uri: str | None = None,
     ):
         self.logdir = logdir
         if is_main_process():
@@ -81,6 +87,21 @@ class Logger:
                 self.wandb = None
         else:
             self.wandb = None
+        self.use_tb = use_tensorboard and is_main_process()
+        if self.use_tb:
+            self.tb_writer = SummaryWriter(log_dir=self.logdir, comment=tb_comment or "")
+            if config:
+                config_text = "\n".join(f"{k}: {v}" for k, v in config.items())
+                self.tb_writer.add_text("config", config_text, global_step=0)
+
+        self.use_mlflow = use_mlflow and is_main_process()
+        if self.use_mlflow:
+            if mlflow_tracking_uri:
+                mlflow.set_tracking_uri(mlflow_tracking_uri)
+            mlflow.set_experiment(exp_project or exp_name or "default")
+            mlflow.start_run(run_name=exp_name)
+            if config:
+                mlflow.log_params(config)
         return
 
     def config(self, config: dict):
@@ -233,7 +254,26 @@ class Logger:
                         data={x_axis_name: x_axis_step},
                         step=global_step
                     )
+            if self.use_tb:
+                for name, m in metrics.metrics.items():
+                    tag = f"{prefix + '_' if prefix else ''}{name}"
+                    value = getattr(m, statistic)
+                    self.tb_writer.add_scalar(tag, value, global_step)
+
+            # 4) MLflow
+            if self.use_mlflow:
+                for name, m in metrics.metrics.items():
+                    tag = f"{prefix + '_' if prefix else ''}{name}"
+                    mlflow.log_metric(tag, getattr(m, statistic), step=global_step)
         return
+    
+    def close(self):
+        """Call this at the end of your run to flush/close clients."""
+        if self.use_tb:
+            self.tb_writer.close()
+        if self.use_mlflow:
+            mlflow.end_run()
+        return 
 
     def _write_dict_to_yaml(self, x: dict, filename: str, mode: str = "w"):
         with open(os.path.join(self.logdir, filename), mode=mode) as f:

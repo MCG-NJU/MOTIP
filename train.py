@@ -47,6 +47,8 @@ def train_engine(config: dict):
     logger = Logger(
         logdir=os.path.join(outputs_dir, "train"),
         use_wandb=config["USE_WANDB"],
+        use_tensorboard=config["USE_TENSORBOARD"],
+        use_mlflow=config["USE_MLFLOW"],
         config=config,
         exp_owner=config["EXP_OWNER"],
         exp_project=config["EXP_PROJECT"],
