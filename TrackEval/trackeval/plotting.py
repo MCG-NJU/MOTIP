@@ -1,10 +1,11 @@
-
 import os
 import numpy as np
 from .utils import TrackEvalException
 
 
-def plot_compare_trackers(tracker_folder, tracker_list, cls, output_folder, plots_list=None):
+def plot_compare_trackers(
+    tracker_folder, tracker_list, cls, output_folder, plots_list=None
+):
     """Create plots which compare metrics across different trackers."""
     # Define what to plot
     if plots_list is None:
@@ -22,15 +23,14 @@ def plot_compare_trackers(tracker_folder, tracker_list, cls, output_folder, plot
 def get_default_plots_list():
     # y_label, x_label, sort_label, bg_label, bg_function
     plots_list = [
-        ['AssA', 'DetA', 'HOTA', 'HOTA', 'geometric_mean'],
-        ['AssPr', 'AssRe', 'HOTA', 'AssA', 'jaccard'],
-        ['DetPr', 'DetRe', 'HOTA', 'DetA', 'jaccard'],
-        ['HOTA(0)', 'LocA(0)', 'HOTA', 'HOTALocA(0)', 'multiplication'],
-        ['HOTA', 'LocA', 'HOTA', None, None],
-
-        ['HOTA', 'MOTA', 'HOTA', None, None],
-        ['HOTA', 'IDF1', 'HOTA', None, None],
-        ['IDF1', 'MOTA', 'HOTA', None, None],
+        ["AssA", "DetA", "HOTA", "HOTA", "geometric_mean"],
+        ["AssPr", "AssRe", "HOTA", "AssA", "jaccard"],
+        ["DetPr", "DetRe", "HOTA", "DetA", "jaccard"],
+        ["HOTA(0)", "LocA(0)", "HOTA", "HOTALocA(0)", "multiplication"],
+        ["HOTA", "LocA", "HOTA", None, None],
+        ["HOTA", "MOTA", "HOTA", None, None],
+        ["HOTA", "IDF1", "HOTA", None, None],
+        ["IDF1", "MOTA", "HOTA", None, None],
     ]
     return plots_list
 
@@ -39,19 +39,28 @@ def load_multiple_tracker_summaries(tracker_folder, tracker_list, cls):
     """Loads summary data for multiple trackers."""
     data = {}
     for tracker in tracker_list:
-        with open(os.path.join(tracker_folder, tracker, cls + '_summary.txt')) as f:
-            keys = next(f).split(' ')
+        with open(os.path.join(tracker_folder, tracker, cls + "_summary.txt")) as f:
+            keys = next(f).split(" ")
             done = False
             while not done:
-                values = next(f).split(' ')
+                values = next(f).split(" ")
                 if len(values) == len(keys):
                     done = True
             data[tracker] = dict(zip(keys, map(float, values)))
     return data
 
 
-def create_comparison_plot(data, out_loc, y_label, x_label, sort_label, bg_label=None, bg_function=None, settings=None):
-    """ Creates a scatter plot comparing multiple trackers between two metric fields, with one on the x-axis and the
+def create_comparison_plot(
+    data,
+    out_loc,
+    y_label,
+    x_label,
+    sort_label,
+    bg_label=None,
+    bg_function=None,
+    settings=None,
+):
+    """Creates a scatter plot comparing multiple trackers between two metric fields, with one on the x-axis and the
     other on the y axis. Adds pareto optical lines and (optionally) a background contour.
 
     Inputs:
@@ -74,26 +83,35 @@ def create_comparison_plot(data, out_loc, y_label, x_label, sort_label, bg_label
         gap_val = 2
         num_to_plot = 20
     else:
-        gap_val = settings['gap_val']
-        num_to_plot = settings['num_to_plot']
+        gap_val = settings["gap_val"]
+        num_to_plot = settings["num_to_plot"]
 
     if (bg_label is None) != (bg_function is None):
-        raise TrackEvalException('bg_function and bg_label must either be both given or neither given.')
+        raise TrackEvalException(
+            "bg_function and bg_label must either be both given or neither given."
+        )
 
     # Extract data
     tracker_names = np.array(list(data.keys()))
     sort_index = np.array([data[t][sort_label] for t in tracker_names]).argsort()[::-1]
-    x_values = np.array([data[t][x_label] for t in tracker_names])[sort_index][:num_to_plot]
-    y_values = np.array([data[t][y_label] for t in tracker_names])[sort_index][:num_to_plot]
+    x_values = np.array([data[t][x_label] for t in tracker_names])[sort_index][
+        :num_to_plot
+    ]
+    y_values = np.array([data[t][y_label] for t in tracker_names])[sort_index][
+        :num_to_plot
+    ]
 
     # Print info on what is being plotted
     tracker_names = tracker_names[sort_index][:num_to_plot]
-    print('\nPlotting %s vs %s, for the following (ordered) trackers:' % (y_label, x_label))
+    print(
+        "\nPlotting %s vs %s, for the following (ordered) trackers:"
+        % (y_label, x_label)
+    )
     for i, name in enumerate(tracker_names):
-        print('%i: %s' % (i+1, name))
+        print("%i: %s" % (i + 1, name))
 
     # Find best fitting boundaries for data
-    boundaries = _get_boundaries(x_values, y_values, round_val=gap_val/2)
+    boundaries = _get_boundaries(x_values, y_values, round_val=gap_val / 2)
 
     fig = plt.figure()
 
@@ -106,35 +124,51 @@ def create_comparison_plot(data, out_loc, y_label, x_label, sort_label, bg_label
 
     # Plot data points with number labels
     labels = np.arange(len(y_values)) + 1
-    plt.plot(x_values, y_values, 'b.', markersize=15)
+    plt.plot(x_values, y_values, "b.", markersize=15)
     for xx, yy, l in zip(x_values, y_values, labels):
         plt.text(xx, yy, str(l), color="red", fontsize=15)
 
     # Add extra explanatory text to plots
-    plt.text(0, -0.11, 'label order:\nHOTA', horizontalalignment='left', verticalalignment='center',
-             transform=fig.axes[0].transAxes, color="red", fontsize=12)
+    plt.text(
+        0,
+        -0.11,
+        "label order:\nHOTA",
+        horizontalalignment="left",
+        verticalalignment="center",
+        transform=fig.axes[0].transAxes,
+        color="red",
+        fontsize=12,
+    )
     if bg_label is not None:
-        plt.text(1, -0.11, 'curve values:\n' + bg_label, horizontalalignment='right', verticalalignment='center',
-                 transform=fig.axes[0].transAxes, color="grey", fontsize=12)
+        plt.text(
+            1,
+            -0.11,
+            "curve values:\n" + bg_label,
+            horizontalalignment="right",
+            verticalalignment="center",
+            transform=fig.axes[0].transAxes,
+            color="grey",
+            fontsize=12,
+        )
 
     plt.xlabel(x_label, fontsize=15)
     plt.ylabel(y_label, fontsize=15)
-    title = y_label + ' vs ' + x_label
+    title = y_label + " vs " + x_label
     if bg_label is not None:
-        title += ' (' + bg_label + ')'
+        title += " (" + bg_label + ")"
     plt.title(title, fontsize=17)
     plt.xticks(np.arange(0, 100, gap_val))
     plt.yticks(np.arange(0, 100, gap_val))
     min_x, max_x, min_y, max_y = boundaries
     plt.xlim(min_x, max_x)
     plt.ylim(min_y, max_y)
-    plt.gca().set_aspect('equal', adjustable='box')
+    plt.gca().set_aspect("equal", adjustable="box")
     plt.tight_layout()
 
     os.makedirs(out_loc, exist_ok=True)
-    filename = os.path.join(out_loc, title.replace(' ', '_'))
-    plt.savefig(filename + '.pdf', bbox_inches='tight', pad_inches=0.05)
-    plt.savefig(filename + '.png', bbox_inches='tight', pad_inches=0.05)
+    filename = os.path.join(out_loc, title.replace(" ", "_"))
+    plt.savefig(filename + ".pdf", bbox_inches="tight", pad_inches=0.05)
+    plt.savefig(filename + ".png", bbox_inches="tight", pad_inches=0.05)
 
 
 def _get_boundaries(x_values, y_values, round_val):
@@ -172,11 +206,11 @@ bg_function_dict = {
     "geometric_mean": geometric_mean,
     "jaccard": jaccard,
     "multiplication": multiplication,
-    }
+}
 
 
 def _plot_bg_contour(bg_function, plot_boundaries, gap_val):
-    """ Plot background contour. """
+    """Plot background contour."""
 
     # Only loaded when run to reduce minimum requirements
     from matplotlib import pyplot as plt
@@ -189,20 +223,22 @@ def _plot_bg_contour(bg_function, plot_boundaries, gap_val):
     if bg_function in bg_function_dict.keys():
         z_grid = bg_function_dict[bg_function](x_grid, y_grid)
     else:
-        raise TrackEvalException("background plotting function '%s' is not defined." % bg_function)
+        raise TrackEvalException(
+            "background plotting function '%s' is not defined." % bg_function
+        )
     levels = np.arange(0, 100, gap_val)
-    con = plt.contour(x_grid, y_grid, z_grid, levels, colors='grey')
+    con = plt.contour(x_grid, y_grid, z_grid, levels, colors="grey")
 
     def bg_format(val):
-        s = '{:1f}'.format(val)
-        return '{:.0f}'.format(val) if s[-1] == '0' else s
+        s = "{:1f}".format(val)
+        return "{:.0f}".format(val) if s[-1] == "0" else s
 
     con.levels = [bg_format(val) for val in con.levels]
-    plt.clabel(con, con.levels, inline=True, fmt='%r', fontsize=8)
+    plt.clabel(con, con.levels, inline=True, fmt="%r", fontsize=8)
 
 
 def _plot_pareto_optimal_lines(x_values, y_values):
-    """ Plot pareto optimal lines """
+    """Plot pareto optimal lines"""
 
     # Only loaded when run to reduce minimum requirements
     from matplotlib import pyplot as plt
@@ -227,4 +263,4 @@ def _plot_pareto_optimal_lines(x_values, y_values):
         cxs = cxs[remaining]
     x_pareto.append(x_pareto[t - 1])
     y_pareto.append(0)
-    plt.plot(np.array(x_pareto), np.array(y_pareto), '--r')
+    plt.plot(np.array(x_pareto), np.array(y_pareto), "--r")

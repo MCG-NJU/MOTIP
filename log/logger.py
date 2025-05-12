@@ -1,21 +1,18 @@
 # Copyright (c) Ruopeng Gao. All Rights Reserved.
 
-import os
-import json
 import argparse
-import yaml
-import wandb
-
-from tqdm import tqdm
+import json
+import os
 from typing import Any
 
+import wandb
+import yaml
+from accelerate.state import PartialState
+from tqdm import tqdm
+
+from data.joint_dataset import JointDataset
 from log.log import Metrics
 from utils.misc import is_main_process
-from accelerate.state import PartialState
-from data.joint_dataset import JointDataset
-from torch.utils.tensorboard import SummaryWriter
-import mlflow
-
 
 state = PartialState()
 
@@ -26,7 +23,9 @@ class ProgressLogger:
         Init a progress logger.
         """
         self.only_main = only_main
-        self.is_activate = (self.only_main and is_main_process()) or (self.only_main is False)
+        self.is_activate = (self.only_main and is_main_process()) or (
+            self.only_main is False
+        )
 
         if self.is_activate:
             self.total_len = total_len
@@ -50,29 +49,32 @@ class Logger:
     """
     Log information.
     """
+
     def __init__(
-            self,
-            logdir: str,
-            use_wandb: bool,
-            use_tensorboard: bool = False,
-            use_mlflow: bool = False,
-            config: dict | None = None,       # log to wandb
-            exp_owner: str | None = None,
-            exp_project: str | None = None,
-            exp_group: str | None = None,
-            exp_name: str | None = None,
-            tb_comment: str | None = None,
-            mlflow_tracking_uri: str | None = None,
+        self,
+        logdir: str,
+        use_wandb: bool,
+        config: dict | None = None,  # log to wandb
+        exp_owner: str | None = None,
+        exp_project: str | None = None,
+        exp_group: str | None = None,
+        exp_name: str | None = None,
+        tb_comment: str | None = None,
+        mlflow_tracking_uri: str | None = None,
     ):
         self.logdir = logdir
         if is_main_process():
             os.makedirs(self.logdir, exist_ok=True)
-            if use_wandb:       # init wandb
+            if use_wandb:  # init wandb
                 assert config is not None, "Please set the config for the experiment."
                 assert exp_owner is not None, "Please set the owner of the experiment."
-                assert exp_project is not None, "Please set the project of the experiment."
+                assert (
+                    exp_project is not None
+                ), "Please set the project of the experiment."
                 if exp_group is None:
-                    self.warning("The group of the experiment is not set. Please make sure it is what you want.")
+                    self.warning(
+                        "The group of the experiment is not set. Please make sure it is what you want."
+                    )
                     exp_group = "default"
                 assert exp_name is not None, "Please set the name of the experiment."
                 self.wandb = wandb.init(
@@ -82,26 +84,11 @@ class Logger:
                     entity=exp_owner,
                     name=exp_name,
                     config=config,
-                )   # for more details, see https://docs.wandb.ai/ref/python/init
+                )  # for more details, see https://docs.wandb.ai/ref/python/init
             else:
                 self.wandb = None
         else:
             self.wandb = None
-        self.use_tb = use_tensorboard and is_main_process()
-        if self.use_tb:
-            self.tb_writer = SummaryWriter(log_dir=self.logdir, comment=tb_comment or "")
-            if config:
-                config_text = "\n".join(f"{k}: {v}" for k, v in config.items())
-                self.tb_writer.add_text("config", config_text, global_step=0)
-
-        self.use_mlflow = use_mlflow and is_main_process()
-        if self.use_mlflow:
-            if mlflow_tracking_uri:
-                mlflow.set_tracking_uri(mlflow_tracking_uri)
-            mlflow.set_experiment(exp_project or exp_name or "default")
-            mlflow.start_run(run_name=exp_name)
-            if config:
-                mlflow.log_params(config)
         return
 
     def config(self, config: dict):
@@ -112,7 +99,9 @@ class Logger:
     def dataset(self, dataset: JointDataset):
         dataset_statistics = dataset.statistics()
         for _statistic in dataset_statistics:
-            self._print(log=f"{self._colorize(log='[Loaded Data]', log_type='success')} {_statistic}")
+            self._print(
+                log=f"{self._colorize(log='[Loaded Data]', log_type='success')} {_statistic}"
+            )
             self._save(log=f"[Loaded Data] {_statistic}")
         return
 
@@ -129,33 +118,42 @@ class Logger:
         return
 
     def info(self, log: str, only_main: bool = True):
-        self._print(log=f"{self._colorize(log='[INFO]', log_type='info')} {log}", only_main=only_main)
+        self._print(
+            log=f"{self._colorize(log='[INFO]', log_type='info')} {log}",
+            only_main=only_main,
+        )
         self._save(log=f"[INFO] {log}", only_main=only_main)
         return
 
     def warning(self, log: str, only_main: bool = True):
-        self._print(log=f"{self._colorize(log='[WARNING]', log_type='warning')} {log}", only_main=only_main)
+        self._print(
+            log=f"{self._colorize(log='[WARNING]', log_type='warning')} {log}",
+            only_main=only_main,
+        )
         self._save(log=f"[WARNING] {log}", only_main=only_main)
         return
 
     def success(self, log: str, only_main: bool = True):
-        self._print(log=f"{self._colorize(log='[SUCCESS]', log_type='success')} {log}", only_main=only_main)
+        self._print(
+            log=f"{self._colorize(log='[SUCCESS]', log_type='success')} {log}",
+            only_main=only_main,
+        )
         self._save(log=f"[SUCCESS] {log}", only_main=only_main)
         return
 
     def metrics(
-            self,
-            log: str,
-            metrics,
-            fmt: None | str = "{average:.4f} ({global_average:.4f})",
-            statistic: None | str = "average",
-            global_step: int = 0,
-            prefix: None | str = None,
-            x_axis_step: None | int = None,
-            x_axis_name: None | str = None,
-            filename: str = "log.txt",
-            file_mode: str = "a",
-            only_main: bool = True
+        self,
+        log: str,
+        metrics,
+        fmt: None | str = "{average:.4f} ({global_average:.4f})",
+        statistic: None | str = "average",
+        global_step: int = 0,
+        prefix: None | str = None,
+        x_axis_step: None | int = None,
+        x_axis_name: None | str = None,
+        filename: str = "log.txt",
+        file_mode: str = "a",
+        only_main: bool = True,
     ):
         self.print_metrics(
             metrics=metrics,
@@ -181,43 +179,58 @@ class Logger:
         if self._is_to_do(only_main=only_main):
             print(log)
 
-    def _save(self, log: str, filename: str = "log.txt", mode: str = "a", only_main: bool = True, end: str = "\n"):
+    def _save(
+        self,
+        log: str,
+        filename: str = "log.txt",
+        mode: str = "a",
+        only_main: bool = True,
+        end: str = "\n",
+    ):
         if self._is_to_do(only_main=only_main):
             with open(os.path.join(self.logdir, filename), mode=mode) as f:
                 f.write(log + end)
         return
 
     def print_metrics(
-            self, metrics: Metrics, prompt: str = "",
-            fmt: str = "{average:.4f} ({global_average:.4f})",
-            only_main: bool = True,
+        self,
+        metrics: Metrics,
+        prompt: str = "",
+        fmt: str = "{average:.4f} ({global_average:.4f})",
+        only_main: bool = True,
     ):
         if self._is_to_do(only_main):
             print(prompt, end="")
             print(metrics.fmt(fmt=fmt))
         return
 
-    def save_metrics_to_file(self, metrics: Metrics, prompt: str = "",
-                             fmt: str = "{average:.4f} ({global_average:.4f})",
-                             filename: str = "log.txt", mode: str = "a", only_main: bool = True):
+    def save_metrics_to_file(
+        self,
+        metrics: Metrics,
+        prompt: str = "",
+        fmt: str = "{average:.4f} ({global_average:.4f})",
+        filename: str = "log.txt",
+        mode: str = "a",
+        only_main: bool = True,
+    ):
         if self._is_to_do(only_main):
             log = f"{prompt}{metrics.fmt(fmt=fmt)}"
             self._save(log=log, filename=filename, mode=mode)
         return
 
     def save_metrics(
-            self,
-            metrics: Metrics,
-            prompt: str = "",
-            fmt: None | str = "{average:.4f} ({global_average:.4f})",
-            statistic: None | str = "average",
-            global_step: int = 0,
-            prefix: None | str = None,
-            x_axis_step: None | int = None,
-            x_axis_name: None | str = None,
-            filename: str = "log.txt",
-            file_mode: str = "a",
-            only_main: bool = True,
+        self,
+        metrics: Metrics,
+        prompt: str = "",
+        fmt: None | str = "{average:.4f} ({global_average:.4f})",
+        statistic: None | str = "average",
+        global_step: int = 0,
+        prefix: None | str = None,
+        x_axis_step: None | int = None,
+        x_axis_name: None | str = None,
+        filename: str = "log.txt",
+        file_mode: str = "a",
+        only_main: bool = True,
     ):
         """
         Save the metrics into .txt/wandb.
@@ -241,39 +254,30 @@ class Logger:
         """
         if fmt is not None:
             self.save_metrics_to_file(
-                metrics=metrics, prompt=prompt, fmt=fmt, filename=filename, mode=file_mode, only_main=only_main
+                metrics=metrics,
+                prompt=prompt,
+                fmt=fmt,
+                filename=filename,
+                mode=file_mode,
+                only_main=only_main,
             )
         if statistic is not None:
             if self.wandb:
-                self.save_metrics_to_wandb(metrics=metrics, statistic=statistic,
-                                           global_step=global_step, prefix=prefix)
+                self.save_metrics_to_wandb(
+                    metrics=metrics,
+                    statistic=statistic,
+                    global_step=global_step,
+                    prefix=prefix,
+                )
                 if x_axis_step is not None:
                     if x_axis_name is None:
-                        raise RuntimeError(f"If you set x_axis_step, you should also set a valid x_axis_name.")
-                    self.wandb_log(     # see https://github.com/wandb/wandb/issues/410 for more details.
-                        data={x_axis_name: x_axis_step},
-                        step=global_step
+                        raise RuntimeError(
+                            f"If you set x_axis_step, you should also set a valid x_axis_name."
+                        )
+                    self.wandb_log(  # see https://github.com/wandb/wandb/issues/410 for more details.
+                        data={x_axis_name: x_axis_step}, step=global_step
                     )
-            if self.use_tb:
-                for name, m in metrics.metrics.items():
-                    tag = f"{prefix + '_' if prefix else ''}{name}"
-                    value = getattr(m, statistic)
-                    self.tb_writer.add_scalar(tag, value, global_step)
-
-            # 4) MLflow
-            if self.use_mlflow:
-                for name, m in metrics.metrics.items():
-                    tag = f"{prefix + '_' if prefix else ''}{name}"
-                    mlflow.log_metric(tag, getattr(m, statistic), step=global_step)
         return
-    
-    def close(self):
-        """Call this at the end of your run to flush/close clients."""
-        if self.use_tb:
-            self.tb_writer.close()
-        if self.use_mlflow:
-            mlflow.end_run()
-        return 
 
     def _write_dict_to_yaml(self, x: dict, filename: str, mode: str = "w"):
         with open(os.path.join(self.logdir, filename), mode=mode) as f:
@@ -316,8 +320,13 @@ class Logger:
             wandb.log(data=data, step=step)
         return
 
-    def save_metrics_to_wandb(self, metrics: Metrics, statistic: str = "average",
-                              global_step: int = 0, prefix: None | str = None):
+    def save_metrics_to_wandb(
+        self,
+        metrics: Metrics,
+        statistic: str = "average",
+        global_step: int = 0,
+        prefix: None | str = None,
+    ):
         for name, value in metrics.metrics.items():
             if prefix is not None:
                 metric_name = f"{prefix}_{name}"

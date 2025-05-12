@@ -1,6 +1,7 @@
 # Copyright (c) Ruopeng Gao. All Rights Reserved.
 
 import os
+
 from PIL import Image
 
 from .dancetrack import DanceTrack
@@ -8,11 +9,11 @@ from .dancetrack import DanceTrack
 
 class BFT(DanceTrack):
     def __init__(
-            self,
-            data_root: str = "./datasets/",
-            sub_dir: str = "BFT",
-            split: str = "train",
-            load_annotation: bool = True,
+        self,
+        data_root: str = "./datasets/",
+        sub_dir: str = "BFT",
+        split: str = "train",
+        load_annotation: bool = True,
     ):
         super(BFT, self).__init__(
             data_root=data_root,
@@ -24,13 +25,21 @@ class BFT(DanceTrack):
 
     @staticmethod
     def _get_image_path(sequence_dir, frame_idx):
-        return os.path.join(sequence_dir, "img1", f"{frame_idx + 1:06d}.jpg")  # different from DanceTrack
+        return os.path.join(
+            sequence_dir, "img1", f"{frame_idx + 1:06d}.jpg"
+        )  # different from DanceTrack
+
+    @staticmethod
+    def _get_mask_path(sequence_dir, obj_id, frame_idx):
+        return os.path.join(sequence_dir, "mask", str(obj_id), f"{frame_idx+1:06d}.png")
 
     def _get_sequence_infos(self):
         sequence_names = self._get_sequence_names()
         sequence_infos = dict()
         for sequence_name in sequence_names:
-            sequence_dir = self._get_sequence_dir(self.data_dir, self.split, sequence_name)
+            sequence_dir = self._get_sequence_dir(
+                self.data_dir, self.split, sequence_name
+            )
             img_names = os.listdir(os.path.join(sequence_dir, "img1"))
             # Get the length of the sequence:
             seq_len = len(img_names)

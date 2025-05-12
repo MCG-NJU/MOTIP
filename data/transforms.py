@@ -37,6 +37,7 @@ class MultiSimulate:
     """
     Simulate a video clip from a sequence of images.
     """
+
     def __init__(self, max_shift_ratio: float, overflow_bbox: bool):
         self.max_shift_ratio = max_shift_ratio
         self.overflow_bbox = overflow_bbox
@@ -92,7 +93,9 @@ class MultiSimulate:
                 shifted_images.append(_image)
                 shifted_annotations.append(_ann)
             # Check if the shifted sequence is legal:
-            _is_legals = torch.tensor([_ann["is_legal"] for _ann in shifted_annotations])
+            _is_legals = torch.tensor(
+                [_ann["is_legal"] for _ann in shifted_annotations]
+            )
             if not _is_legals.all().item():
                 return images, annotations, metas
             else:
@@ -116,6 +119,7 @@ class MultiStack:
     Stack a sequence of images into a single tensor, (T, C, H, W).
     The result tensor is more suitable for multi-image processing.
     """
+
     def __init__(self):
         return
 
@@ -159,14 +163,14 @@ class MultiRandomHorizontalFlip:
                 assert isinstance(images[0], Image.Image)
                 images = [v2.functional.hflip(_) for _ in images]
             else:
-                raise NotImplementedError(f"The input image type {type(images)} is not supported.")
+                raise NotImplementedError(
+                    f"The input image type {type(images)} is not supported."
+                )
             h, w = get_image_hw(images)
             for annotation in annotations:
-                annotation["bbox"] = (
-                    annotation["bbox"][:, [2, 1, 0, 3]]
-                    * torch.as_tensor([-1, 1, -1, 1])
-                    + torch.as_tensor([w, 0, w, 0])
-                )
+                annotation["bbox"] = annotation["bbox"][
+                    :, [2, 1, 0, 3]
+                ] * torch.as_tensor([-1, 1, -1, 1]) + torch.as_tensor([w, 0, w, 0])
         return images, annotations, metas
 
 
@@ -189,13 +193,19 @@ class MultiRandomResize:
         self.max_size = max_size
 
     def __call__(self, images, annotations, metas):
-        new_shorter = random.choice(self.sizes)     # choose the shorter edge length for images
+        new_shorter = random.choice(
+            self.sizes
+        )  # choose the shorter edge length for images
 
         def get_new_hw(_curr_hw: list, _new_shorter) -> (int, int):
             _curr_h, _curr_w = _curr_hw
-            if self.max_size is not None:       # need to restrict the longer side length
-                _min_hw, _max_hw = float(min(_curr_h, _curr_w)), float(max(_curr_h, _curr_w))
-                if _max_hw / _min_hw * _new_shorter > self.max_size:  # need to restrict the resize size
+            if self.max_size is not None:  # need to restrict the longer side length
+                _min_hw, _max_hw = float(min(_curr_h, _curr_w)), float(
+                    max(_curr_h, _curr_w)
+                )
+                if (
+                    _max_hw / _min_hw * _new_shorter > self.max_size
+                ):  # need to restrict the resize size
                     _new_shorter = int(floor(self.max_size * _min_hw / _max_hw))
             # Calculate the new height and width:
             if _curr_w < _curr_h:
@@ -206,7 +216,7 @@ class MultiRandomResize:
                 _new_w = int(round(_new_shorter * _curr_w / _curr_h))
             return _new_h, _new_w
 
-        new_hw = get_new_hw(get_image_hw(images), _new_shorter=new_shorter)    # new yx
+        new_hw = get_new_hw(get_image_hw(images), _new_shorter=new_shorter)  # new yx
         scale_ratio_x = new_hw[1] / get_image_hw(images)[1]
         scale_ratio_y = new_hw[0] / get_image_hw(images)[0]
         # Resize images:
@@ -216,10 +226,14 @@ class MultiRandomResize:
             assert isinstance(images[0], Image.Image)
             images = [v2.functional.resize(_, new_hw) for _ in images]
         else:
-            raise NotImplementedError(f"The input image type {type(images)} is not supported.")
+            raise NotImplementedError(
+                f"The input image type {type(images)} is not supported."
+            )
         # Resize annotations:
         for annotation in annotations:
-            annotation["bbox"] = annotation["bbox"] * torch.as_tensor([scale_ratio_x, scale_ratio_y] * 2)
+            annotation["bbox"] = annotation["bbox"] * torch.as_tensor(
+                [scale_ratio_x, scale_ratio_y] * 2
+            )
         return images, annotations, metas
 
 
@@ -240,7 +254,9 @@ class MultiRandomCrop:
         _annotations = copy.deepcopy(annotations)
         _i, _j, _h, _w = crop_ijhw
         for _annotation in _annotations:
-            _annotation["bbox"] = _annotation["bbox"] - torch.tensor([_j, _i, _j, _i])  # (x1,y1,x2,y2) - (j,i,j,i)
+            _annotation["bbox"] = _annotation["bbox"] - torch.tensor(
+                [_j, _i, _j, _i]
+            )  # (x1,y1,x2,y2) - (j,i,j,i)
             _bbox = _annotation["bbox"].clone()
             _max_wh = torch.tensor([_w, _h])
             # If the crop box is out of the image, we need to adjust the bbox:
@@ -250,9 +266,7 @@ class MultiRandomCrop:
             # _legal_idxs = torch.all(
             #     torch.tensor(_bbox[:, 1, :] > _bbox[:, 0, :]), dim=1
             # )
-            _legal_idxs = torch.all(
-                _bbox[:, 1, :] > _bbox[:, 0, :], dim=1
-            )
+            _legal_idxs = torch.all(_bbox[:, 1, :] > _bbox[:, 0, :], dim=1)
             # Reshape to the original format:
             _bbox = _bbox.reshape(-1, 4)
             _need_to_select_fields = ["bbox", "category", "id", "visibility"]
@@ -263,7 +277,9 @@ class MultiRandomCrop:
             _annotation["is_legal"] = is_legal(_annotation)
 
         # Check all annotations' legality:
-        _is_legals = torch.tensor([_annotation["is_legal"] for _annotation in _annotations])
+        _is_legals = torch.tensor(
+            [_annotation["is_legal"] for _annotation in _annotations]
+        )
         # If all annotations are illegal, we need to return the original images and annotations:
         if not _is_legals.all().item():
             return images, annotations, metas
@@ -274,24 +290,23 @@ class MultiRandomCrop:
                 assert isinstance(images[0], Image.Image)
                 images = [v2.functional.crop(_, _i, _j, _h, _w) for _ in images]
             else:
-                raise NotImplementedError(f"The input image type {type(images)} is not supported.")
+                raise NotImplementedError(
+                    f"The input image type {type(images)} is not supported."
+                )
             annotations = _annotations
             return images, annotations, metas
 
 
 class MultiColorJitter:
     def __init__(
-            self,
-            brightness: float = 0.0,
-            contrast: float = 0.0,
-            saturation: float = 0.0,
-            hue: float = 0.0
+        self,
+        brightness: float = 0.0,
+        contrast: float = 0.0,
+        saturation: float = 0.0,
+        hue: float = 0.0,
     ):
         self.color_jitter = v2.ColorJitter(
-            brightness=brightness,
-            contrast=contrast,
-            saturation=saturation,
-            hue=hue
+            brightness=brightness, contrast=contrast, saturation=saturation, hue=hue
         )
 
     def __call__(self, images, annotations, metas):
@@ -302,7 +317,9 @@ class MultiColorJitter:
             params = self.color_jitter._get_params([images[0]])
             images = [self.color_jitter._transform(_, params=params) for _ in images]
         else:
-            raise NotImplementedError(f"The input image type {type(images)} is not supported.")
+            raise NotImplementedError(
+                f"The input image type {type(images)} is not supported."
+            )
         return images, annotations, metas
 
 
@@ -312,7 +329,9 @@ class MultiRandomPhotometricDistort:
 
     def __call__(self, images, annotations, metas):
         _params = self.ramdom_photometric_distort._get_params([images[0]])
-        images = [self.ramdom_photometric_distort._transform(_, _params) for _ in images]
+        images = [
+            self.ramdom_photometric_distort._transform(_, _params) for _ in images
+        ]
         return images, annotations, metas
 
 
@@ -337,9 +356,14 @@ class MultiToDtype:
             images = v2.functional.to_dtype(images, dtype=torch.float32, scale=True)
         elif isinstance(images, list):
             assert isinstance(images[0], torch.Tensor)
-            images = [v2.functional.to_dtype(_, dtype=torch.float32, scale=True) for _ in images]
+            images = [
+                v2.functional.to_dtype(_, dtype=torch.float32, scale=True)
+                for _ in images
+            ]
         else:
-            raise NotImplementedError(f"The input image type {type(images)} is not supported.")
+            raise NotImplementedError(
+                f"The input image type {type(images)} is not supported."
+            )
         return images, annotations, metas
 
 
@@ -372,8 +396,11 @@ class MultiNormalizeBoundingBoxes:
 
 # For MOTIP only, biding the ID label:
 
+
 class GenerateIDLabels:
-    def __init__(self, num_id_vocabulary: int, aug_num_groups: int, num_training_ids: int):
+    def __init__(
+        self, num_id_vocabulary: int, aug_num_groups: int, num_training_ids: int
+    ):
         self.num_id_vocabulary = num_id_vocabulary
         self.aug_num_groups = aug_num_groups
         self.num_training_ids = num_training_ids
@@ -394,9 +421,11 @@ class GenerateIDLabels:
         # (4): a (_G, _T, _N) tensor, representing the time index of each object.
 
         ids_list = list(ids_set)
-        id_to_idx = {ids_list[_]: _ for _ in range(_N)}     # the idx in the final ID labels
+        id_to_idx = {
+            ids_list[_]: _ for _ in range(_N)
+        }  # the idx in the final ID labels
         base_id_masks = torch.ones((_T, _N), dtype=torch.bool)
-        base_ann_idxs = - torch.ones((_T, _N), dtype=torch.int64)
+        base_ann_idxs = -torch.ones((_T, _N), dtype=torch.int64)
         # These "base" ID anns are used to generate the final ID anns, do not directly use them.
         for t in range(_T):
             annotation = annotations[t]
@@ -412,15 +441,25 @@ class GenerateIDLabels:
         # If the number of IDs is larger than `num_id_vocabulary`, we need to randomly select a subset of IDs.
         # Also, if the number of IDs is larger than `num_training_ids`, we need to randomly select a subset of IDs.
         if _N > self.num_id_vocabulary or _N > self.num_training_ids:
-            _random_select_idxs = torch.randperm(_N)[:self.num_training_ids if _N > self.num_training_ids else self.num_id_vocabulary]
+            _random_select_idxs = torch.randperm(_N)[
+                : (
+                    self.num_training_ids
+                    if _N > self.num_training_ids
+                    else self.num_id_vocabulary
+                )
+            ]
             base_id_masks = base_id_masks[:, _random_select_idxs]
             base_ann_idxs = base_ann_idxs[:, _random_select_idxs]
-            _N = self.num_training_ids if _N > self.num_training_ids else self.num_id_vocabulary
+            _N = (
+                self.num_training_ids
+                if _N > self.num_training_ids
+                else self.num_id_vocabulary
+            )
             pass
         # Normal processing:
         id_labels = torch.zeros((_G, _T, _N), dtype=torch.int64)
         id_masks = torch.ones((_G, _T, _N), dtype=torch.bool)
-        ann_idxs = - torch.ones((_G, _T, _N), dtype=torch.int64)
+        ann_idxs = -torch.ones((_G, _T, _N), dtype=torch.int64)
         for group in range(_G):
             _random_id_labels = torch.randperm(self.num_id_vocabulary)[:_N]
             _random_id_labels = _random_id_labels[None, ...].repeat(_T, 1)
@@ -434,10 +473,18 @@ class GenerateIDLabels:
         assert id_labels.shape == id_masks.shape == ann_idxs.shape == times.shape
 
         # Split the ID anns into each frame:
-        id_labels_list = torch.split(id_labels, split_size_or_sections=1, dim=1)    # each item is in (_G, 1, _N)
-        id_masks_list = torch.split(id_masks, split_size_or_sections=1, dim=1)      # each item is in (_G, 1, _N)
-        ann_idxs_list = torch.split(ann_idxs, split_size_or_sections=1, dim=1)      # each item is in (_G, 1, _N)
-        times_list = torch.split(times, split_size_or_sections=1, dim=1)            # each item is in (_G, 1, _N)
+        id_labels_list = torch.split(
+            id_labels, split_size_or_sections=1, dim=1
+        )  # each item is in (_G, 1, _N)
+        id_masks_list = torch.split(
+            id_masks, split_size_or_sections=1, dim=1
+        )  # each item is in (_G, 1, _N)
+        ann_idxs_list = torch.split(
+            ann_idxs, split_size_or_sections=1, dim=1
+        )  # each item is in (_G, 1, _N)
+        times_list = torch.split(
+            times, split_size_or_sections=1, dim=1
+        )  # each item is in (_G, 1, _N)
 
         # Update the annotations (put the ID anns into the annotations):
         for t in range(_T):
@@ -451,10 +498,10 @@ class GenerateIDLabels:
 
 class TurnIntoTrajectoryAndUnknown:
     def __init__(
-            self,
-            num_id_vocabulary: int,
-            aug_trajectory_occlusion_prob: float,
-            aug_trajectory_switch_prob: float,
+        self,
+        num_id_vocabulary: int,
+        aug_trajectory_occlusion_prob: float,
+        aug_trajectory_switch_prob: float,
     ):
         self.num_id_vocabulary = num_id_vocabulary
         self.aug_trajectory_occlusion_prob = aug_trajectory_occlusion_prob
@@ -462,9 +509,15 @@ class TurnIntoTrajectoryAndUnknown:
         return
 
     def __call__(self, images, annotations, metas):
-        id_labels = torch.cat([annotation["id_labels"] for annotation in annotations], dim=1)
-        id_masks = torch.cat([annotation["id_masks"] for annotation in annotations], dim=1)
-        ann_idxs = torch.cat([annotation["ann_idxs"] for annotation in annotations], dim=1)
+        id_labels = torch.cat(
+            [annotation["id_labels"] for annotation in annotations], dim=1
+        )
+        id_masks = torch.cat(
+            [annotation["id_masks"] for annotation in annotations], dim=1
+        )
+        ann_idxs = torch.cat(
+            [annotation["ann_idxs"] for annotation in annotations], dim=1
+        )
         times = torch.cat([annotation["times"] for annotation in annotations], dim=1)
         _G, _T, _N = id_labels.shape
         # Del these fields from the annotations:
@@ -487,11 +540,17 @@ class TurnIntoTrajectoryAndUnknown:
         if self.aug_trajectory_occlusion_prob > 0.0:
             # Make trajectory occlusion:
             # 1. Turn the shape into (_G * _N, _T):
-            trajectory_id_masks = einops.rearrange(trajectory_id_masks, "G T N -> (G N) T")
+            trajectory_id_masks = einops.rearrange(
+                trajectory_id_masks, "G T N -> (G N) T"
+            )
             unknown_id_masks = einops.rearrange(unknown_id_masks, "G T N -> (G N) T")
             # 2. Generate the occlusion mask:
-            trajectory_occlusion_masks = torch.zeros_like(trajectory_id_masks, dtype=torch.bool)
-            unknown_occlusion_masks = torch.zeros_like(unknown_id_masks, dtype=torch.bool)
+            trajectory_occlusion_masks = torch.zeros_like(
+                trajectory_id_masks, dtype=torch.bool
+            )
+            unknown_occlusion_masks = torch.zeros_like(
+                unknown_id_masks, dtype=torch.bool
+            )
             for i in range(_G * _N):
                 if random.random() < self.aug_trajectory_occlusion_prob:
                     begin_idx = random.randint(0, _T - 1)
@@ -505,32 +564,52 @@ class TurnIntoTrajectoryAndUnknown:
             trajectory_id_masks = trajectory_id_masks | trajectory_occlusion_masks
             unknown_id_masks = unknown_id_masks | unknown_occlusion_masks
             # 4. Turn the shape back:
-            trajectory_id_masks = einops.rearrange(trajectory_id_masks, "(G N) T -> G T N", G=_G, N=_N)
-            unknown_id_masks = einops.rearrange(unknown_id_masks, "(G N) T -> G T N", G=_G, N=_N)
+            trajectory_id_masks = einops.rearrange(
+                trajectory_id_masks, "(G N) T -> G T N", G=_G, N=_N
+            )
+            unknown_id_masks = einops.rearrange(
+                unknown_id_masks, "(G N) T -> G T N", G=_G, N=_N
+            )
 
         if self.aug_trajectory_switch_prob > 0.0:
             # Make trajectory switch:
             # 1. Turn the shape into (_G * _T, _N):
-            trajectory_id_labels = einops.rearrange(trajectory_id_labels, "G T N -> (G T) N")
-            trajectory_id_masks = einops.rearrange(trajectory_id_masks, "G T N -> (G T) N")
-            trajectory_ann_idxs = einops.rearrange(trajectory_ann_idxs, "G T N -> (G T) N")
+            trajectory_id_labels = einops.rearrange(
+                trajectory_id_labels, "G T N -> (G T) N"
+            )
+            trajectory_id_masks = einops.rearrange(
+                trajectory_id_masks, "G T N -> (G T) N"
+            )
+            trajectory_ann_idxs = einops.rearrange(
+                trajectory_ann_idxs, "G T N -> (G T) N"
+            )
             # 2. Switch for each frame:
             #    (switching the ID labels is the same as switching the ann_idxs and masks)
             for g_t in range(_G * _T):
-                switch_p = torch.ones((_N, )) * self.aug_trajectory_switch_prob
+                switch_p = torch.ones((_N,)) * self.aug_trajectory_switch_prob
                 switch_map = torch.bernoulli(switch_p)
                 switch_idxs = torch.nonzero(switch_map)[:, 0]
-                if len(switch_idxs) > 1:    # make sure can be switched
+                if len(switch_idxs) > 1:  # make sure can be switched
                     shuffled_switch_idxs = switch_idxs[torch.randperm(len(switch_idxs))]
                     # Do switch:
-                    trajectory_ann_idxs[g_t, switch_idxs] = trajectory_ann_idxs[g_t, shuffled_switch_idxs]
-                    trajectory_id_masks[g_t, switch_idxs] = trajectory_id_masks[g_t, shuffled_switch_idxs]
+                    trajectory_ann_idxs[g_t, switch_idxs] = trajectory_ann_idxs[
+                        g_t, shuffled_switch_idxs
+                    ]
+                    trajectory_id_masks[g_t, switch_idxs] = trajectory_id_masks[
+                        g_t, shuffled_switch_idxs
+                    ]
                     pass
                 pass
             # 3. Turn the shape back:
-            trajectory_id_labels = einops.rearrange(trajectory_id_labels, "(G T) N -> G T N", G=_G, T=_T)
-            trajectory_id_masks = einops.rearrange(trajectory_id_masks, "(G T) N -> G T N", G=_G, T=_T)
-            trajectory_ann_idxs = einops.rearrange(trajectory_ann_idxs, "(G T) N -> G T N", G=_G, T=_T)
+            trajectory_id_labels = einops.rearrange(
+                trajectory_id_labels, "(G T) N -> G T N", G=_G, T=_T
+            )
+            trajectory_id_masks = einops.rearrange(
+                trajectory_id_masks, "(G T) N -> G T N", G=_G, T=_T
+            )
+            trajectory_ann_idxs = einops.rearrange(
+                trajectory_ann_idxs, "(G T) N -> G T N", G=_G, T=_T
+            )
             pass
 
         # Check all ID labels are legal:
@@ -539,7 +618,9 @@ class TurnIntoTrajectoryAndUnknown:
 
         # Add "newborn" ID label to unknown ID labels for supervision:
         # 1. Turn the shape into (_G * _N, _T):
-        trajectory_id_labels = einops.rearrange(trajectory_id_labels, "G T N -> (G N) T")
+        trajectory_id_labels = einops.rearrange(
+            trajectory_id_labels, "G T N -> (G N) T"
+        )
         trajectory_id_masks = einops.rearrange(trajectory_id_masks, "G T N -> (G N) T")
         unknown_id_labels = einops.rearrange(unknown_id_labels, "G T N -> (G N) T")
         unknown_id_masks = einops.rearrange(unknown_id_masks, "G T N -> (G N) T")
@@ -547,30 +628,37 @@ class TurnIntoTrajectoryAndUnknown:
         already_born_masks = torch.cumsum(~trajectory_id_masks, dim=1)
         already_born_masks = already_born_masks > 0
         # 3. Generate the newborn ID labels:
-        newborn_id_label_masks = ~ torch.cat(
-            [
-                torch.zeros((_G * _N, 1), dtype=torch.bool),
-                already_born_masks[:, :-1]
-            ],
-            dim=-1
+        newborn_id_label_masks = ~torch.cat(
+            [torch.zeros((_G * _N, 1), dtype=torch.bool), already_born_masks[:, :-1]],
+            dim=-1,
         )
         unknown_id_labels[newborn_id_label_masks] = self.num_id_vocabulary
         # 4. Turn the shape back:
-        trajectory_id_labels = einops.rearrange(trajectory_id_labels, "(G N) T -> G T N", G=_G, N=_N)
-        trajectory_id_masks = einops.rearrange(trajectory_id_masks, "(G N) T -> G T N", G=_G, N=_N)
-        unknown_id_labels = einops.rearrange(unknown_id_labels, "(G N) T -> G T N", G=_G, N=_N)
-        unknown_id_masks = einops.rearrange(unknown_id_masks, "(G N) T -> G T N", G=_G, N=_N)
+        trajectory_id_labels = einops.rearrange(
+            trajectory_id_labels, "(G N) T -> G T N", G=_G, N=_N
+        )
+        trajectory_id_masks = einops.rearrange(
+            trajectory_id_masks, "(G N) T -> G T N", G=_G, N=_N
+        )
+        unknown_id_labels = einops.rearrange(
+            unknown_id_labels, "(G N) T -> G T N", G=_G, N=_N
+        )
+        unknown_id_masks = einops.rearrange(
+            unknown_id_masks, "(G N) T -> G T N", G=_G, N=_N
+        )
 
         # Update the annotations:
         for t in range(_T):
-            annotations[t]["trajectory_id_labels"] = trajectory_id_labels[:, t:t+1, :]
-            annotations[t]["trajectory_id_masks"] = trajectory_id_masks[:, t:t+1, :]
-            annotations[t]["trajectory_ann_idxs"] = trajectory_ann_idxs[:, t:t+1, :]
-            annotations[t]["trajectory_times"] = trajectory_times[:, t:t+1, :]
-            annotations[t]["unknown_id_labels"] = unknown_id_labels[:, t:t+1, :]
-            annotations[t]["unknown_id_masks"] = unknown_id_masks[:, t:t+1, :]
-            annotations[t]["unknown_ann_idxs"] = unknown_ann_idxs[:, t:t+1, :]
-            annotations[t]["unknown_times"] = unknown_times[:, t:t+1, :]
+            annotations[t]["trajectory_id_labels"] = trajectory_id_labels[
+                :, t : t + 1, :
+            ]
+            annotations[t]["trajectory_id_masks"] = trajectory_id_masks[:, t : t + 1, :]
+            annotations[t]["trajectory_ann_idxs"] = trajectory_ann_idxs[:, t : t + 1, :]
+            annotations[t]["trajectory_times"] = trajectory_times[:, t : t + 1, :]
+            annotations[t]["unknown_id_labels"] = unknown_id_labels[:, t : t + 1, :]
+            annotations[t]["unknown_id_masks"] = unknown_id_masks[:, t : t + 1, :]
+            annotations[t]["unknown_ann_idxs"] = unknown_ann_idxs[:, t : t + 1, :]
+            annotations[t]["unknown_times"] = unknown_times[:, t : t + 1, :]
 
         return images, annotations, metas
 
@@ -578,47 +666,65 @@ class TurnIntoTrajectoryAndUnknown:
 def build_transforms(config: dict):
     # mean = [0.485, 0.456, 0.406]
     # std = [0.229, 0.224, 0.225]
-    return MultiCompose([
-        MultiBoxXYWHtoXYXY(),
-        MultiSimulate(max_shift_ratio=config["AUG_MAX_SHIFT_RATIO"], overflow_bbox=config["AUG_OVERFLOW_BBOX"]),
-        MultiStack(),
-        MultiRandomHorizontalFlip(p=0.5),
-        MultiRandomSelect(
-            MultiRandomResize(sizes=config["AUG_RESIZE_SCALES"], max_size=config["AUG_MAX_SIZE"]),
-            MultiCompose([
-                MultiRandomResize(sizes=config["AUG_RANDOM_RESIZE"]),
-                MultiRandomCrop(
-                    min_size=config["AUG_RANDOM_CROP_MIN"],
-                    max_size=config["AUG_RANDOM_CROP_MAX"],
-                    overflow_bbox=config["AUG_OVERFLOW_BBOX"]
+    return MultiCompose(
+        [
+            MultiBoxXYWHtoXYXY(),
+            MultiSimulate(
+                max_shift_ratio=config["AUG_MAX_SHIFT_RATIO"],
+                overflow_bbox=config["AUG_OVERFLOW_BBOX"],
+            ),
+            MultiStack(),
+            MultiRandomHorizontalFlip(p=0.5),
+            MultiRandomSelect(
+                MultiRandomResize(
+                    sizes=config["AUG_RESIZE_SCALES"], max_size=config["AUG_MAX_SIZE"]
                 ),
-                MultiRandomResize(sizes=config["AUG_RESIZE_SCALES"], max_size=config["AUG_MAX_SIZE"])
-            ])
-        ),
-        MultiBoxXYXYtoCXCYWH(),
-        MultiColorJitter(
-            brightness=config["AUG_BRIGHTNESS"],
-            contrast=config["AUG_CONTRAST"],
-            saturation=config["AUG_SATURATION"],
-            hue=config["AUG_HUE"],
-        ) if not config["AUG_COLOR_JITTER_V2"] else MultiRandomPhotometricDistort(),
-        MultiToTensor(),
-        MultiStack(),
-        # MultiToDtype(torch.float32),
-        # MultiNormalize(mean=mean, std=std),
-        MultiNormalizeBoundingBoxes(),
-        # For MOTIP, biding ID labels:
-        GenerateIDLabels(
-            num_id_vocabulary=config["NUM_ID_VOCABULARY"],
-            aug_num_groups=config["AUG_NUM_GROUPS"],
-            num_training_ids=config.get("NUM_TRAINING_IDS", config["NUM_ID_VOCABULARY"]),
-        ),
-        TurnIntoTrajectoryAndUnknown(
-            num_id_vocabulary=config["NUM_ID_VOCABULARY"],
-            aug_trajectory_occlusion_prob=config["AUG_TRAJECTORY_OCCLUSION_PROB"],
-            aug_trajectory_switch_prob=config["AUG_TRAJECTORY_SWITCH_PROB"],
-        ),
-    ])
+                MultiCompose(
+                    [
+                        MultiRandomResize(sizes=config["AUG_RANDOM_RESIZE"]),
+                        MultiRandomCrop(
+                            min_size=config["AUG_RANDOM_CROP_MIN"],
+                            max_size=config["AUG_RANDOM_CROP_MAX"],
+                            overflow_bbox=config["AUG_OVERFLOW_BBOX"],
+                        ),
+                        MultiRandomResize(
+                            sizes=config["AUG_RESIZE_SCALES"],
+                            max_size=config["AUG_MAX_SIZE"],
+                        ),
+                    ]
+                ),
+            ),
+            MultiBoxXYXYtoCXCYWH(),
+            (
+                MultiColorJitter(
+                    brightness=config["AUG_BRIGHTNESS"],
+                    contrast=config["AUG_CONTRAST"],
+                    saturation=config["AUG_SATURATION"],
+                    hue=config["AUG_HUE"],
+                )
+                if not config["AUG_COLOR_JITTER_V2"]
+                else MultiRandomPhotometricDistort()
+            ),
+            MultiToTensor(),
+            MultiStack(),
+            # MultiToDtype(torch.float32),
+            # MultiNormalize(mean=mean, std=std),
+            MultiNormalizeBoundingBoxes(),
+            # For MOTIP, biding ID labels:
+            GenerateIDLabels(
+                num_id_vocabulary=config["NUM_ID_VOCABULARY"],
+                aug_num_groups=config["AUG_NUM_GROUPS"],
+                num_training_ids=config.get(
+                    "NUM_TRAINING_IDS", config["NUM_ID_VOCABULARY"]
+                ),
+            ),
+            TurnIntoTrajectoryAndUnknown(
+                num_id_vocabulary=config["NUM_ID_VOCABULARY"],
+                aug_trajectory_occlusion_prob=config["AUG_TRAJECTORY_OCCLUSION_PROB"],
+                aug_trajectory_switch_prob=config["AUG_TRAJECTORY_SWITCH_PROB"],
+            ),
+        ]
+    )
 
 
 def get_image_hw(image: torch.Tensor | list | Image.Image):

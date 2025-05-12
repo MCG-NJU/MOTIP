@@ -19,7 +19,7 @@ class OrderedSet:
         return iter(self.dict.keys())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ordered_deque = OrderedSet()
     ordered_deque.add(1)
     ordered_deque.add(3)

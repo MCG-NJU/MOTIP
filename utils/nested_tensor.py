@@ -8,11 +8,12 @@ from typing import Optional, List
 class NestedTensor(object):
     def __init__(self, tensors: torch.Tensor, mask: Optional[torch.Tensor]):
         """Args:
-            tensors: Tensor, (B, C, H, W)
-            mask: Tensor, (B, H, W)
+        tensors: Tensor, (B, C, H, W)
+        mask: Tensor, (B, H, W)
         """
-        assert tensors.shape[0] == mask.shape[0], \
-            f"tensors have batch size {tensors.shape[0]} but get {mask.shape[0]} for mask."
+        assert (
+            tensors.shape[0] == mask.shape[0]
+        ), f"tensors have batch size {tensors.shape[0]} but get {mask.shape[0]} for mask."
         self.tensors = tensors
         self.mask = mask
 
@@ -51,20 +52,32 @@ class NestedTensor(object):
         return NestedTensor(tensors=self.tensors.clone(), mask=self.mask.clone())
 
 
-def nested_tensor_from_tensor_list(tensor_list: List[torch.Tensor], size_divisibility: int = 0) -> NestedTensor:
+def nested_tensor_from_tensor_list(
+    tensor_list: List[torch.Tensor], size_divisibility: int = 0
+) -> NestedTensor:
     """
     Args:
         tensor_list: List of tensors, each tensor should have shape (C, H, W)
         size_divisibility:
     Returns:
     """
-    assert tensor_list[0].dim() == 3, f"Tensor should have 3 dimensions, but get {tensor_list[0].dim()}"
+    assert (
+        tensor_list[0].dim() == 3
+    ), f"Tensor should have 3 dimensions, but get {tensor_list[0].dim()}"
 
-    heights, widths = zip(*[t.shape[1:] for t in tensor_list])  # heights, widths = [H1, H2, ..., Hn], [W1, W2, ..., Wn]
+    heights, widths = zip(
+        *[t.shape[1:] for t in tensor_list]
+    )  # heights, widths = [H1, H2, ..., Hn], [W1, W2, ..., Wn]
     # Calculate the shape (max size) of the NestedTensor:
     # final              B                         C                                 H       W
-    final_shape = [len(tensor_list)] + [tensor_list[0].shape[0]] + list(map(max, (heights, widths)))
-    final_b, final_c, final_h, final_w = final_shape    # get the final shape of the NestedTensor
+    final_shape = (
+        [len(tensor_list)]
+        + [tensor_list[0].shape[0]]
+        + list(map(max, (heights, widths)))
+    )
+    final_b, final_c, final_h, final_w = (
+        final_shape  # get the final shape of the NestedTensor
+    )
     # If size_divisibility > 0, we need to adjust the final_h and final_w to be divisible by size_divisibility
     if size_divisibility > 0:
         stride = size_divisibility
@@ -79,15 +92,22 @@ def nested_tensor_from_tensor_list(tensor_list: List[torch.Tensor], size_divisib
     mask = torch.ones((final_b, final_h, final_w), dtype=torch.bool, device=device)
     # Fill the tensor and mask one by one:
     for input_tensor, pad_tensor, pad_mask in zip(tensor_list, tensor, mask):
-        assert input_tensor.shape[0] == final_shape[1], "Tensor channel size should be equal."
-        pad_tensor[: input_tensor.shape[0], : input_tensor.shape[1], : input_tensor.shape[2]].copy_(input_tensor)
+        assert (
+            input_tensor.shape[0] == final_shape[1]
+        ), "Tensor channel size should be equal."
+        pad_tensor[
+            : input_tensor.shape[0], : input_tensor.shape[1], : input_tensor.shape[2]
+        ].copy_(input_tensor)
         pad_mask[: input_tensor.shape[1], : input_tensor.shape[2]] = False
     return NestedTensor(tensors=tensor, mask=mask)
 
 
-def nested_tensor_index_select(nested_tensor: NestedTensor, dim: int, index: torch.Tensor):
+def nested_tensor_index_select(
+    nested_tensor: NestedTensor, dim: int, index: torch.Tensor
+):
     tensor, mask = nested_tensor.decompose()
-    selected_tensor = torch.index_select(input=tensor, dim=dim, index=index).contiguous()
+    selected_tensor = torch.index_select(
+        input=tensor, dim=dim, index=index
+    ).contiguous()
     selected_mask = torch.index_select(input=mask, dim=dim, index=index).contiguous()
     return NestedTensor(tensors=selected_tensor, mask=selected_mask)
-

@@ -29,7 +29,9 @@ def submit_and_evaluate(config: dict):
     mode = config["INFERENCE_MODE"]
     assert mode in ["submit", "evaluate"], f"Mode {mode} is not supported."
     # Generate the output dir:
-    assert "OUTPUTS_DIR" in config and config["OUTPUTS_DIR"] is not None, "OUTPUTS_DIR is not set."
+    assert (
+        "OUTPUTS_DIR" in config and config["OUTPUTS_DIR"] is not None
+    ), "OUTPUTS_DIR is not set."
     outputs_dir = config["OUTPUTS_DIR"]
     inference_group = config["INFERENCE_GROUP"]
     inference_dataset = config["INFERENCE_DATASET"]
@@ -37,7 +39,12 @@ def submit_and_evaluate(config: dict):
     inference_model = config["INFERENCE_MODEL"]
     _inference_model_name = os.path.split(inference_model)[-1][:-4]
     outputs_dir = os.path.join(
-        outputs_dir, mode, inference_group, inference_dataset, inference_split, _inference_model_name
+        outputs_dir,
+        mode,
+        inference_group,
+        inference_dataset,
+        inference_split,
+        _inference_model_name,
     )
     _is_outputs_dir_exist = os.path.exists(outputs_dir)
     accelerator.wait_for_everyone()
@@ -61,8 +68,10 @@ def submit_and_evaluate(config: dict):
         f"inference split: {inference_split}, inference group: {inference_group}."
     )
     if _is_outputs_dir_exist:
-        logger.warning(f"Outputs dir '{outputs_dir}' already exists, may overwrite the existing files.")
-        time.sleep(5)   # wait for 5 seconds, give the user a chance to cancel.
+        logger.warning(
+            f"Outputs dir '{outputs_dir}' already exists, may overwrite the existing files."
+        )
+        time.sleep(5)  # wait for 5 seconds, give the user a chance to cancel.
     else:
         logger.info(f"Outputs dir '{outputs_dir}' created.")
 
@@ -73,6 +82,7 @@ def submit_and_evaluate(config: dict):
         load_checkpoint(model, path=config["INFERENCE_MODEL"])
     else:
         from models.misc import load_previous_checkpoint
+
         load_previous_checkpoint(model, path=config["INFERENCE_MODEL"])
 
     model = accelerator.prepare(model)
@@ -87,7 +97,9 @@ def submit_and_evaluate(config: dict):
         dataset=config["INFERENCE_DATASET"],
         data_split=config["INFERENCE_SPLIT"],
         outputs_dir=outputs_dir,
-        image_max_longer=config["INFERENCE_MAX_LONGER"],    # the max shorter side of the image is set to 800 by default
+        image_max_longer=config[
+            "INFERENCE_MAX_LONGER"
+        ],  # the max shorter side of the image is set to 800 by default
         size_divisibility=config.get("SIZE_DIVISIBILITY", 0),
         use_sigmoid=config.get("USE_FOCAL_LOSS", False),
         assignment_protocol=config.get("ASSIGNMENT_PROTOCOL", "hungarian"),
@@ -96,8 +108,11 @@ def submit_and_evaluate(config: dict):
         newborn_thresh=config["NEWBORN_THRESH"],
         id_thresh=config["ID_THRESH"],
         area_thresh=config.get("AREA_THRESH", 0),
-        inference_only_detr=config["INFERENCE_ONLY_DETR"] if config["INFERENCE_ONLY_DETR"] is not None
-        else config["ONLY_DETR"],
+        inference_only_detr=(
+            config["INFERENCE_ONLY_DETR"]
+            if config["INFERENCE_ONLY_DETR"] is not None
+            else config["ONLY_DETR"]
+        ),
         dtype=config.get("INFERENCE_DTYPE", "FP32"),
     )
 
@@ -105,7 +120,7 @@ def submit_and_evaluate(config: dict):
         metrics.sync()
         logger.metrics(
             log=f"Finish evaluation for model '{inference_model}', dataset '{inference_dataset}', "
-                f"split '{inference_split}', group '{inference_group}': ",
+            f"split '{inference_split}', group '{inference_group}': ",
             metrics=metrics,
             fmt="{global_average:.4f}",
         )
@@ -113,29 +128,29 @@ def submit_and_evaluate(config: dict):
 
 
 def submit_and_evaluate_one_model(
-        is_evaluate: bool,
-        accelerator: Accelerator,
-        state: PartialState,
-        logger: Logger,
-        model,
-        data_root: str,
-        dataset: str,
-        data_split: str,
-        # Outputs:
-        outputs_dir: str,
-        # Parameters with defaults:
-        image_max_shorter: int = 800,
-        image_max_longer: int = 1536,
-        size_divisibility: int = 0,
-        use_sigmoid: bool = False,
-        assignment_protocol: str = "hungarian",
-        miss_tolerance: int = 30,
-        det_thresh: float = 0.5,
-        newborn_thresh: float = 0.5,
-        id_thresh: float = 0.1,
-        area_thresh: int = 0,
-        inference_only_detr: bool = False,
-        dtype: str = "FP32",
+    is_evaluate: bool,
+    accelerator: Accelerator,
+    state: PartialState,
+    logger: Logger,
+    model,
+    data_root: str,
+    dataset: str,
+    data_split: str,
+    # Outputs:
+    outputs_dir: str,
+    # Parameters with defaults:
+    image_max_shorter: int = 800,
+    image_max_longer: int = 1536,
+    size_divisibility: int = 0,
+    use_sigmoid: bool = False,
+    assignment_protocol: str = "hungarian",
+    miss_tolerance: int = 30,
+    det_thresh: float = 0.5,
+    newborn_thresh: float = 0.5,
+    id_thresh: float = 0.1,
+    area_thresh: int = 0,
+    inference_only_detr: bool = False,
+    dtype: str = "FP32",
 ):
     # Build the datasets:
     inference_dataset = dataset_classes[dataset](
@@ -145,9 +160,12 @@ def submit_and_evaluate_one_model(
     )
     # Set the dtype during inference:
     match dtype:
-        case "FP32": dtype=torch.float32
-        case "FP16": dtype=torch.float16
-        case _: raise ValueError(f"Unknown dtype '{dtype}'.")
+        case "FP32":
+            dtype = torch.float32
+        case "FP16":
+            dtype = torch.float16
+        case _:
+            raise ValueError(f"Unknown dtype '{dtype}'.")
     # Filter out the sequences that will not be processed in this GPU (if we have multiple GPUs):
     _inference_sequence_names = list(inference_dataset.sequence_infos.keys())
     _inference_sequence_names.sort()
@@ -156,14 +174,18 @@ def submit_and_evaluate_one_model(
     if len(_inference_sequence_names) <= state.process_index:
         logger.info(
             log=f"Number of sequences is smaller than the number of processes, "
-                f"a fake sequence will be processed on process {state.process_index}.",
+            f"a fake sequence will be processed on process {state.process_index}.",
             only_main=False,
         )
         inference_dataset.sequence_infos = {
-            _inference_sequence_names[0]: inference_dataset.sequence_infos[_inference_sequence_names[0]]
+            _inference_sequence_names[0]: inference_dataset.sequence_infos[
+                _inference_sequence_names[0]
+            ]
         }
         inference_dataset.image_paths = {
-            _inference_sequence_names[0]: inference_dataset.image_paths[_inference_sequence_names[0]]
+            _inference_sequence_names[0]: inference_dataset.image_paths[
+                _inference_sequence_names[0]
+            ]
         }
         is_fake = True
     else:
@@ -210,24 +232,33 @@ def submit_and_evaluate_one_model(
         if is_fake:
             logger.info(
                 f"Fake submitting sequence {sequence_name} with {len(sequence_loader)} frames.",
-                only_main=False
+                only_main=False,
             )
         else:
-            logger.info(f"Submitting sequence {sequence_name} with {len(sequence_loader)} frames.", only_main=False)
+            logger.info(
+                f"Submitting sequence {sequence_name} with {len(sequence_loader)} frames.",
+                only_main=False,
+            )
         sequence_results, sequence_fps = get_results_of_one_sequence(
             runtime_tracker=runtime_tracker,
             sequence_loader=sequence_loader,
             logger=logger,
         )
         # Write the results to the submit file:
-        if dataset in ["DanceTrack", "SportsMOT", "MOT17", "PersonPath22_Inference", "BFT"]:
+        if dataset in [
+            "DanceTrack",
+            "SportsMOT",
+            "MOT17",
+            "PersonPath22_Inference",
+            "BFT",
+        ]:
             sequence_tracker_results = []
             for t in range(len(sequence_results)):
                 for obj_id, score, category, bbox in zip(
-                        sequence_results[t]["id"],
-                        sequence_results[t]["score"],
-                        sequence_results[t]["category"],
-                        sequence_results[t]["bbox"],    # [x, y, w, h]
+                    sequence_results[t]["id"],
+                    sequence_results[t]["score"],
+                    sequence_results[t]["category"],
+                    sequence_results[t]["bbox"],  # [x, y, w, h]
                 ):
                     sequence_tracker_results.append(
                         f"{t + 1},{obj_id.item()},"
@@ -236,16 +267,25 @@ def submit_and_evaluate_one_model(
                     )
             if not is_fake:
                 os.makedirs(os.path.join(outputs_dir, "tracker"), exist_ok=True)
-                with open(os.path.join(outputs_dir, "tracker", f"{sequence_name}.txt"), "w") as submit_file:
+                with open(
+                    os.path.join(outputs_dir, "tracker", f"{sequence_name}.txt"), "w"
+                ) as submit_file:
                     submit_file.writelines(sequence_tracker_results)
-                logger.success(f"Submit sequence {sequence_name} done, FPS: {sequence_fps:.2f}. "
-                               f"Saved to {os.path.join(outputs_dir, 'tracker', f'{sequence_name}.txt')}.",
-                               only_main=False)
+                logger.success(
+                    f"Submit sequence {sequence_name} done, FPS: {sequence_fps:.2f}. "
+                    f"Saved to {os.path.join(outputs_dir, 'tracker', f'{sequence_name}.txt')}.",
+                    only_main=False,
+                )
             else:
-                logger.success(f"Fake submit sequence {sequence_name} done, FPS: {sequence_fps:.2f}.", only_main=False)
+                logger.success(
+                    f"Fake submit sequence {sequence_name} done, FPS: {sequence_fps:.2f}.",
+                    only_main=False,
+                )
             pass
         else:
-            raise NotImplementedError(f"Do not support to submit the results for dataset '{dataset}'.")
+            raise NotImplementedError(
+                f"Do not support to submit the results for dataset '{dataset}'."
+            )
 
     # Post-process for submitting and evaluation:
     accelerator.wait_for_everyone()
@@ -269,13 +309,19 @@ def submit_and_evaluate_one_model(
                 gt_dir = os.path.join(data_root, dataset, "gts", "person_path_22-test")
                 tracker_dir = os.path.join(outputs_dir, "tracker")
             else:
-                raise NotImplementedError(f"Do not support to find the gt_dir for dataset '{dataset}'.")
-            if dataset in ["DanceTrack", "SportsMOT", "BFT"] or (dataset in ["MOT17"] and data_split == "test"):
+                raise NotImplementedError(
+                    f"Do not support to find the gt_dir for dataset '{dataset}'."
+                )
+            if dataset in ["DanceTrack", "SportsMOT", "BFT"] or (
+                dataset in ["MOT17"] and data_split == "test"
+            ):
                 args = {
                     "--SPLIT_TO_EVAL": data_split,
                     "--METRICS": ["HOTA", "CLEAR", "Identity"],
                     "--GT_FOLDER": gt_dir,
-                    "--SEQMAP_FILE": os.path.join(data_root, dataset, f"{data_split}_seqmap.txt"),
+                    "--SEQMAP_FILE": os.path.join(
+                        data_root, dataset, f"{data_split}_seqmap.txt"
+                    ),
                     "--SKIP_SPLIT_FOL": "True",
                     "--TRACKERS_TO_EVAL": "",
                     "--TRACKER_SUB_FOLDER": "",
@@ -294,7 +340,9 @@ def submit_and_evaluate_one_model(
                     "--NUM_PARALLEL_CORES": "8",
                     "--TRACKERS_FOLDER": tracker_dir,
                     "--BENCHMARK": "person_path_22",
-                    "--SEQMAP_FILE": os.path.join(data_root, dataset, "gts", "seqmaps", "person_path_22-test.txt"),
+                    "--SEQMAP_FILE": os.path.join(
+                        data_root, dataset, "gts", "seqmaps", "person_path_22-test.txt"
+                    ),
                     "--SKIP_SPLIT_FOL": "True",
                     "--TRACKER_SUB_FOLDER": "",
                     "--TRACKERS_TO_EVAL": "",
@@ -322,7 +370,9 @@ def submit_and_evaluate_one_model(
         # Wait for all processes:
         accelerator.wait_for_everyone()
         # Get the metrics:
-        eval_metrics_path = os.path.join(outputs_dir, "tracker", "pedestrian_summary.txt")
+        eval_metrics_path = os.path.join(
+            outputs_dir, "tracker", "pedestrian_summary.txt"
+        )
         eval_metrics_dict = get_eval_metrics_dict(metric_path=eval_metrics_path)
         metrics = Metrics()
         metrics["HOTA"].update(eval_metrics_dict["HOTA"])
@@ -344,9 +394,9 @@ def submit_and_evaluate_one_model(
 
 @torch.no_grad()
 def get_results_of_one_sequence(
-        logger: Logger,
-        runtime_tracker: RuntimeTracker,
-        sequence_loader: DataLoader,
+    logger: Logger,
+    runtime_tracker: RuntimeTracker,
+    sequence_loader: DataLoader,
 ):
     tracker_results = []
     assert len(sequence_loader) > 10, "The sequence loader is too short."
@@ -367,13 +417,11 @@ def get_eval_metrics_dict(metric_path: str):
     with open(metric_path) as f:
         metric_names = f.readline()[:-1].split(" ")
         metric_values = f.readline()[:-1].split(" ")
-    metrics = {
-        n: float(v) for n, v in zip(metric_names, metric_values)
-    }
+    metrics = {n: float(v) for n, v in zip(metric_names, metric_values)}
     return metrics
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
     # Get runtime option:

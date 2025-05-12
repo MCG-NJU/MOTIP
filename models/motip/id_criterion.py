@@ -10,9 +10,9 @@ from utils.misc import is_distributed, distributed_world_size, labels_to_one_hot
 
 class IDCriterion(nn.Module):
     def __init__(
-            self,
-            weight: float,
-            use_focal_loss: bool,
+        self,
+        weight: float,
+        use_focal_loss: bool,
     ):
         super().__init__()
         self.weight = weight
@@ -39,12 +39,20 @@ class IDCriterion(nn.Module):
         id_labels_flatten = id_labels_flatten[~id_masks_flatten]
         # Calculate the loss:
         if self.use_focal_loss:
-            id_labels_flatten_one_hot = labels_to_one_hot(id_labels_flatten, class_num=id_logits_flatten.shape[-1])
-            id_labels_flatten_one_hot = torch.tensor(id_labels_flatten_one_hot, device=id_logits.device)
-            loss = sigmoid_focal_loss(inputs=id_logits_flatten, targets=id_labels_flatten_one_hot).sum()
+            id_labels_flatten_one_hot = labels_to_one_hot(
+                id_labels_flatten, class_num=id_logits_flatten.shape[-1]
+            )
+            id_labels_flatten_one_hot = torch.tensor(
+                id_labels_flatten_one_hot, device=id_logits.device
+            )
+            loss = sigmoid_focal_loss(
+                inputs=id_logits_flatten, targets=id_labels_flatten_one_hot
+            ).sum()
         else:
             loss = self.ce_loss(id_logits_flatten, id_labels_flatten).sum()
-        num_ids = torch.as_tensor([len(id_logits_flatten)], dtype=torch.float, device=id_logits.device)
+        num_ids = torch.as_tensor(
+            [len(id_logits_flatten)], dtype=torch.float, device=id_logits.device
+        )
 
         if is_distributed():
             torch.distributed.all_reduce(num_ids)

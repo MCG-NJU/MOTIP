@@ -7,10 +7,10 @@ from models.ffn import FFN
 
 class TrajectoryModeling(nn.Module):
     def __init__(
-            self,
-            detr_dim: int,
-            ffn_dim_ratio: int,
-            feature_dim: int,
+        self,
+        detr_dim: int,
+        ffn_dim_ratio: int,
+        feature_dim: int,
     ):
         super().__init__()
 

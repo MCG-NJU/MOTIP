@@ -5,11 +5,11 @@ import os
 
 class OneDataset:
     def __init__(
-            self,
-            data_root: str = "./datasets/",
-            sub_dir: str = "OneDataset",
-            split: str = "train",
-            load_annotation: bool = True,
+        self,
+        data_root: str = "./datasets/",
+        sub_dir: str = "OneDataset",
+        split: str = "train",
+        load_annotation: bool = True,
     ):
         self.data_dir = os.path.join(data_root, sub_dir)
         self.split = split
@@ -17,6 +17,7 @@ class OneDataset:
 
         # Null data:
         self.sequence_infos, self.image_paths, self.annotations = None, None, None
+        self.mask_paths = None
         return
 
     def get_sequence_infos(self):
@@ -24,6 +25,9 @@ class OneDataset:
 
     def get_image_paths(self):
         return self.image_paths
+
+    def get_mask_paths(self):
+        return self.mask_paths
 
     def get_annotations(self):
         if self.load_annotation:

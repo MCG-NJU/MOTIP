@@ -15,45 +15,25 @@ from torchvision.ops.boxes import box_area
 
 def box_xyxy_to_cxcywh(boxes: torch.Tensor) -> torch.Tensor:
     x1, y1, x2, y2 = boxes.unbind(-1)
-    boxes = [
-        (x1 + x2) / 2,
-        (y1 + y2) / 2,
-        (x2 - x1),
-        (y2 - y1)
-    ]
+    boxes = [(x1 + x2) / 2, (y1 + y2) / 2, (x2 - x1), (y2 - y1)]
     return torch.stack(boxes, dim=-1)
 
 
 def box_cxcywh_to_xyxy(boxes: torch.Tensor) -> torch.Tensor:
     cx, cy, w, h = boxes.unbind(-1)
-    boxes = [
-        (cx - 0.5 * w),
-        (cy - 0.5 * h),
-        (cx + 0.5 * w),
-        (cy + 0.5 * h)
-    ]
+    boxes = [(cx - 0.5 * w), (cy - 0.5 * h), (cx + 0.5 * w), (cy + 0.5 * h)]
     return torch.stack(boxes, dim=-1)
 
 
 def box_cxcywh_to_xywh(boxes: torch.Tensor) -> torch.Tensor:
     cx, cy, w, h = boxes.unbind(-1)
-    boxes = [
-        (cx - 0.5 * w),
-        (cy - 0.5 * h),
-        w,
-        h
-    ]
+    boxes = [(cx - 0.5 * w), (cy - 0.5 * h), w, h]
     return torch.stack(boxes, dim=-1)
 
 
 def box_xywh_to_xyxy(boxes: torch.Tensor) -> torch.Tensor:
     x, y, w, h = boxes.unbind(-1)
-    boxes = [
-        x,
-        y,
-        x + w,
-        y + h
-    ]
+    boxes = [x, y, x + w, y + h]
     return torch.stack(boxes, dim=-1)
 
 
@@ -65,8 +45,8 @@ def box_iou_union(boxes1, boxes2):
 
     Returns: iou, union
     """
-    area1 = box_area(boxes1)    # [N, ]
-    area2 = box_area(boxes2)    # [M, ]
+    area1 = box_area(boxes1)  # [N, ]
+    area2 = box_area(boxes2)  # [M, ]
     lt = torch.max(boxes1[:, None, :2], boxes2[:, :2])  # [N,M,2]
     rb = torch.min(boxes1[:, None, 2:], boxes2[:, 2:])  # [N,M,2]
 
@@ -89,8 +69,9 @@ def generalized_box_iou(boxes1, boxes2):
     """
     # degenerate boxes gives inf / nan results
     # so do an early check
-    assert (boxes1[:, 2:] >= boxes1[:, :2]).all(), \
-        f"illegal boxes1: {boxes1[~ ((boxes1[:, 2:] >= boxes1[:, :2])[:, 0] & (boxes1[:, 2:] >= boxes1[:, :2])[:, 1])]}"
+    assert (
+        boxes1[:, 2:] >= boxes1[:, :2]
+    ).all(), f"illegal boxes1: {boxes1[~ ((boxes1[:, 2:] >= boxes1[:, :2])[:, 0] & (boxes1[:, 2:] >= boxes1[:, :2])[:, 1])]}"
     assert (boxes2[:, 2:] >= boxes2[:, :2]).all()
     iou, union = box_iou_union(boxes1, boxes2)
 

@@ -10,11 +10,11 @@ from PIL import Image
 
 class CrowdHuman(DanceTrack):
     def __init__(
-            self,
-            data_root: str = "./datasets/",
-            sub_dir: str = "CrowdHuman",
-            split: str = "train",
-            load_annotation: bool = True,
+        self,
+        data_root: str = "./datasets/",
+        sub_dir: str = "CrowdHuman",
+        split: str = "train",
+        load_annotation: bool = True,
     ):
         super(CrowdHuman, self).__init__(
             data_root=data_root,
@@ -46,7 +46,9 @@ class CrowdHuman(DanceTrack):
         for sequence_name in sequence_names:
             sequence_image_dir = os.path.join(self.data_dir, self.split, "images")
             for i in range(self.sequence_infos[sequence_name]["length"]):
-                image_paths[sequence_name].append(os.path.join(sequence_image_dir, f"{sequence_name}.jpg"))
+                image_paths[sequence_name].append(
+                    os.path.join(sequence_image_dir, f"{sequence_name}.jpg")
+                )
         return image_paths
 
     def _get_annotations(self):
@@ -65,7 +67,7 @@ class CrowdHuman(DanceTrack):
                     x, y, w, h = map(float, [x, y, w, h])
                     bbox = [x, y, w, h]
                     category, visibility = 0, 1.0
-                    ann_index = frame_id        # already 0-indexed for annotations
+                    ann_index = frame_id  # already 0-indexed for annotations
                     # Organized into the annotations:
                     annotations[sequence_name][ann_index] = append_annotation(
                         annotation=annotations[sequence_name][ann_index],
@@ -77,7 +79,9 @@ class CrowdHuman(DanceTrack):
         # Determine whether each annotation is legal:
         for sequence_name in sequence_names:
             for i in range(self.sequence_infos[sequence_name]["length"]):
-                annotations[sequence_name][i]["is_legal"] = is_legal(annotations[sequence_name][i])
+                annotations[sequence_name][i]["is_legal"] = is_legal(
+                    annotations[sequence_name][i]
+                )
         return annotations
 
     def _get_sequence_names(self):

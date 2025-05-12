@@ -45,27 +45,37 @@ def build(config: dict):
         case "deformable_detr":
             detr, detr_criterion, _ = build_deformable_detr(args=detr_args)
         case _:
-            raise NotImplementedError(f"DETR framework {config['DETR_FRAMEWORK']} is not supported.")
+            raise NotImplementedError(
+                f"DETR framework {config['DETR_FRAMEWORK']} is not supported."
+            )
 
     # Build each component:
     # 1. trajectory modeling (currently, only FFNs are used):
-    _trajectory_modeling = TrajectoryModeling(
-        detr_dim=config["DETR_HIDDEN_DIM"],
-        ffn_dim_ratio=config["FFN_DIM_RATIO"],
-        feature_dim=config["FEATURE_DIM"],
-    ) if config["ONLY_DETR"] is False else None
+    _trajectory_modeling = (
+        TrajectoryModeling(
+            detr_dim=config["DETR_HIDDEN_DIM"],
+            ffn_dim_ratio=config["FFN_DIM_RATIO"],
+            feature_dim=config["FEATURE_DIM"],
+        )
+        if config["ONLY_DETR"] is False
+        else None
+    )
     # 2. ID decoder:
-    _id_decoder = IDDecoder(
-        feature_dim=config["FEATURE_DIM"],
-        id_dim=config["ID_DIM"],
-        ffn_dim_ratio=config["FFN_DIM_RATIO"],
-        num_layers=config["NUM_ID_DECODER_LAYERS"],
-        head_dim=config["HEAD_DIM"],
-        num_id_vocabulary=config["NUM_ID_VOCABULARY"],
-        rel_pe_length=config["REL_PE_LENGTH"],
-        use_aux_loss=config["USE_AUX_LOSS"],
-        use_shared_aux_head=config["USE_SHARED_AUX_HEAD"],
-    ) if config["ONLY_DETR"] is False else None
+    _id_decoder = (
+        IDDecoder(
+            feature_dim=config["FEATURE_DIM"],
+            id_dim=config["ID_DIM"],
+            ffn_dim_ratio=config["FFN_DIM_RATIO"],
+            num_layers=config["NUM_ID_DECODER_LAYERS"],
+            head_dim=config["HEAD_DIM"],
+            num_id_vocabulary=config["NUM_ID_VOCABULARY"],
+            rel_pe_length=config["REL_PE_LENGTH"],
+            use_aux_loss=config["USE_AUX_LOSS"],
+            use_shared_aux_head=config["USE_SHARED_AUX_HEAD"],
+        )
+        if config["ONLY_DETR"] is False
+        else None
+    )
 
     # Construct MOTIP model:
     motip_model = MOTIP(

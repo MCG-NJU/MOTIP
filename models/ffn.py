@@ -11,8 +11,4 @@ class FFN(nn.Module):
         self.linear2 = nn.Linear(d_ffn, d_model)
 
     def forward(self, tgt):
-        return self.linear2(
-            self.activation(
-                self.linear1(tgt)
-            )
-        )
+        return self.linear2(self.activation(self.linear1(tgt)))

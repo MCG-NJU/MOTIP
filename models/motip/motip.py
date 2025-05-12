@@ -6,12 +6,12 @@ from torch.utils.checkpoint import checkpoint
 
 class MOTIP(nn.Module):
     def __init__(
-            self,
-            detr: nn.Module,
-            detr_framework: str,
-            only_detr: bool,
-            trajectory_modeling: nn.Module,
-            id_decoder: nn.Module,
+        self,
+        detr: nn.Module,
+        detr_framework: str,
+        only_detr: bool,
+        trajectory_modeling: nn.Module,
+        id_decoder: nn.Module,
     ):
         super().__init__()
         self.detr = detr
@@ -23,7 +23,7 @@ class MOTIP(nn.Module):
         if self.id_decoder is not None:
             self.num_id_vocabulary = self.id_decoder.num_id_vocabulary
         else:
-            self.num_id_vocabulary = 1000           # hack implementation
+            self.num_id_vocabulary = 1000  # hack implementation
 
         return
 
@@ -34,7 +34,8 @@ class MOTIP(nn.Module):
                 frames = kwargs["frames"]
                 if "use_checkpoint" in kwargs:
                     return checkpoint(
-                        self.detr, frames,
+                        self.detr,
+                        frames,
                         use_reentrant=False,
                     )
                 else:
@@ -44,7 +45,15 @@ class MOTIP(nn.Module):
                 return self.trajectory_modeling(seq_info)
             case "id_decoder":
                 seq_info = kwargs["seq_info"]
-                use_decoder_checkpoint = kwargs["use_decoder_checkpoint"] if "use_decoder_checkpoint" in kwargs else False
-                return self.id_decoder(seq_info, use_decoder_checkpoint=use_decoder_checkpoint)
+                use_decoder_checkpoint = (
+                    kwargs["use_decoder_checkpoint"]
+                    if "use_decoder_checkpoint" in kwargs
+                    else False
+                )
+                return self.id_decoder(
+                    seq_info, use_decoder_checkpoint=use_decoder_checkpoint
+                )
             case _:
-                raise NotImplementedError(f"MOTIP forwarding doesn't support part={kwargs['part']}.")
+                raise NotImplementedError(
+                    f"MOTIP forwarding doesn't support part={kwargs['part']}."
+                )

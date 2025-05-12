@@ -14,7 +14,10 @@ def mv_files(root: str, split: str):
         img_names = os.listdir(os.path.join(root, split, seq_name))
         os.makedirs(os.path.join(root, split, seq_name, "img1"), exist_ok=True)
         for img_name in img_names:
-            move(os.path.join(root, split, seq_name, img_name), os.path.join(root, split, seq_name, "img1", img_name))
+            move(
+                os.path.join(root, split, seq_name, img_name),
+                os.path.join(root, split, seq_name, "img1", img_name),
+            )
         # 2. move the gt files:
         gt_path = os.path.join(root, "annotations_mot", split, seq_name + ".txt")
         os.makedirs(os.path.join(root, split, seq_name, "gt"), exist_ok=True)
@@ -32,7 +35,9 @@ def reformat_gts(root: str, split: str):
         with open(gt_path, "w") as f:
             for line in lines:
                 line = line.strip().split(",")
-                f.write(f"{int(line[0])},{int(line[1])},{int(line[2])},{int(line[3])},{int(line[4])},{int(line[5])},1,1,1\n")
+                f.write(
+                    f"{int(line[0])},{int(line[1])},{int(line[2])},{int(line[3])},{int(line[4])},{int(line[5])},1,1,1\n"
+                )
     pass
     return
 
@@ -67,8 +72,7 @@ def gen_ini_files(root: str, split: str):
         pass
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     bft_root = "../datasets/BFT/"
     bft_splits = ["train", "val", "test"]
 
@@ -84,4 +88,3 @@ if __name__ == '__main__':
     for bft_split in bft_splits:
         gen_ini_files(bft_root, bft_split)
         print(f"Done with {bft_split} set.")
-

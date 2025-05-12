@@ -20,6 +20,7 @@ from setuptools import setup
 
 requirements = ["torch", "torchvision"]
 
+
 def get_extensions():
     this_dir = os.path.dirname(os.path.abspath(__file__))
     extensions_dir = os.path.join(this_dir, "src")
@@ -33,8 +34,6 @@ def get_extensions():
     extra_compile_args = {"cxx": []}
     define_macros = []
 
-
-
     if torch.cuda.is_available() and CUDA_HOME is not None:
         extension = CUDAExtension
         sources += source_cuda
@@ -46,7 +45,7 @@ def get_extensions():
             "-D__CUDA_NO_HALF2_OPERATORS__",
         ]
     else:
-        raise NotImplementedError('Cuda is not availabel')
+        raise NotImplementedError("Cuda is not availabel")
 
     sources = [os.path.join(extensions_dir, s) for s in sources]
     include_dirs = [extensions_dir]
@@ -61,13 +60,19 @@ def get_extensions():
     ]
     return ext_modules
 
+
 setup(
     name="MultiScaleDeformableAttention",
     version="1.0",
     author="Weijie Su",
     url="https://github.com/fundamentalvision/Deformable-DETR",
     description="PyTorch Wrapper for CUDA Functions of Multi-Scale Deformable Attention",
-    packages=find_packages(exclude=("configs", "tests",)),
+    packages=find_packages(
+        exclude=(
+            "configs",
+            "tests",
+        )
+    ),
     ext_modules=get_extensions(),
     cmdclass={"build_ext": torch.utils.cpp_extension.BuildExtension},
 )
