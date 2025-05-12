@@ -1,5 +1,12 @@
 # Root gitignore file
-
+outputs
+log
+*__pycache__*
+configs
+.vscode
+models/ops/MultiScaleDeformableAttention.egg-info/
+models/ops/build/
+models/ops/dist/
 # PyCharm
 .idea/
 checkpoints
