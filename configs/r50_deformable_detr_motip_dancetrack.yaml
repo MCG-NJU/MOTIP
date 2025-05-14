@@ -107,7 +107,7 @@ SEPARATE_CLIP_NORM: True
 USE_ACCELERATE_CLIP_NORM: True
 
 # Resumes and Pretrains:
-DETR_PRETRAIN: ./pretrains/r50_deformable_detr_motip_dancetrack.pth
+DETR_PRETRAIN: ./pretrains/r50_deformable_detr_coco_dancetrack.pth
 RESUME_MODEL:
 RESUME_OPTIMIZER: True
 RESUME_SCHEDULER: True
@@ -133,6 +133,7 @@ INFERENCE_ONLY_DETR:
 # Outputs settings:
 OUTPUTS_DIR:                # outputs directory
 USE_WANDB: False             # use wandb or not
+USE_MLFLOW: True
 EXP_OWNER: killian31
 EXP_PROJECT: MOTIP
 EXP_GROUP:

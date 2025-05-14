@@ -1,8 +1,8 @@
 # Copyright (c) Ruopeng Gao. All Rights Reserved.
 
-import torch
+from typing import List, Optional
 
-from typing import Optional, List
+import torch
 
 
 class NestedTensor(object):
@@ -69,7 +69,7 @@ def nested_tensor_from_tensor_list(
         *[t.shape[1:] for t in tensor_list]
     )  # heights, widths = [H1, H2, ..., Hn], [W1, W2, ..., Wn]
     # Calculate the shape (max size) of the NestedTensor:
-    # final              B                         C                                 H       W
+    # final B C H W
     final_shape = (
         [len(tensor_list)]
         + [tensor_list[0].shape[0]]
@@ -94,7 +94,7 @@ def nested_tensor_from_tensor_list(
     for input_tensor, pad_tensor, pad_mask in zip(tensor_list, tensor, mask):
         assert (
             input_tensor.shape[0] == final_shape[1]
-        ), "Tensor channel size should be equal."
+        ), f"Tensor channel size should be equal. Found {input_tensor.shape[0]} and {final_shape[1]}."
         pad_tensor[
             : input_tensor.shape[0], : input_tensor.shape[1], : input_tensor.shape[2]
         ].copy_(input_tensor)

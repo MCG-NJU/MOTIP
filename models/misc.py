@@ -1,13 +1,13 @@
 # Copyright (c) Ruopeng Gao. All Rights Reserved.
 
-import torch
-import torchvision
 import copy
 import math
+
+import torch
 import torch.nn as nn
+import torchvision
 
-from utils.misc import is_main_process, is_distributed
-
+from utils.misc import is_distributed, is_main_process
 
 # Several calculation functions that are used in multiple model structures:
 
@@ -164,7 +164,9 @@ def load_detr_pretrain(
 
     # Transfer the pre-trained parameters to the model state dict.
     for k, v in detr_state_dict.items():
-        assert k in model_state_dict, f"DETR parameter key '{k}' should in the model."
+        assert (
+            k in model_state_dict
+        ), f"DETR parameter key '{k}' should be in the model."
         model_state_dict[k] = v
     # Load the model state dict.
     model.load_state_dict(state_dict=model_state_dict, strict=True)

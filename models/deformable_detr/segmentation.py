@@ -126,14 +126,12 @@ class MaskHeadSmallConv(nn.Module):
             return tensor.unsqueeze(1).repeat(1, int(length), 1, 1, 1).flatten(0, 1)
 
         x = torch.cat([expand(x, bbox_mask.shape[1]), bbox_mask.flatten(0, 1)], 1)
-
         x = self.lay1(x)
         x = self.gn1(x)
         x = F.relu(x)
         x = self.lay2(x)
         x = self.gn2(x)
         x = F.relu(x)
-
         cur_fpn = self.adapter1(fpns[0])
         if cur_fpn.size(0) != x.size(0):
             cur_fpn = expand(cur_fpn, x.size(0) / cur_fpn.size(0))
@@ -141,7 +139,6 @@ class MaskHeadSmallConv(nn.Module):
         x = self.lay3(x)
         x = self.gn3(x)
         x = F.relu(x)
-
         cur_fpn = self.adapter2(fpns[1])
         if cur_fpn.size(0) != x.size(0):
             cur_fpn = expand(cur_fpn, x.size(0) / cur_fpn.size(0))

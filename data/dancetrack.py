@@ -5,6 +5,7 @@ from collections import defaultdict
 from configparser import ConfigParser
 
 import torch
+from tqdm import tqdm
 
 from .one_dataset import OneDataset
 from .util import append_annotation, is_legal
@@ -97,7 +98,9 @@ class DanceTrack(OneDataset):
         # Init the annotations:
         annotations = self._init_annotations(sequence_names)
         # Load the annotations:
-        for sequence_name in sequence_names:
+        for sequence_name in tqdm(
+            sequence_names, desc="Loading annotations", leave=False
+        ):
             sequence_dir = self._get_sequence_dir(
                 self.data_dir, self.split, sequence_name
             )
@@ -111,6 +114,9 @@ class DanceTrack(OneDataset):
                     bbox = [x, y, w, h]
                     category, visibility = 0, 1.0
                     ann_index = frame_id - 1  # 0-indexed for annotations
+                    mask_path = self._get_mask_path(sequence_dir, obj_id, frame_id - 1)
+                    if not os.path.isfile(mask_path):  # some objects might be missing
+                        mask_path = None
                     # Organized into the annotations:
                     annotations[sequence_name][ann_index] = append_annotation(
                         annotation=annotations[sequence_name][ann_index],
@@ -118,6 +124,7 @@ class DanceTrack(OneDataset):
                         category=category,
                         bbox=bbox,
                         visibility=visibility,
+                        mask_path=mask_path,
                     )
         # Determine whether each annotation is legal:
         for sequence_name in sequence_names:

@@ -11,31 +11,34 @@
 """
 Deformable DETR model and criterion classes.
 """
+import copy
+import math
+
 import torch
 import torch.nn.functional as F
 from torch import nn
-import math
-
-from utils import box_ops
-from utils.nested_tensor import NestedTensor, nested_tensor_from_tensor_list
-from models.misc import inverse_sigmoid, accuracy, interpolate
-from utils.misc import is_distributed, distributed_world_size
-
-# from util.misc import (NestedTensor, nested_tensor_from_tensor_list,
-#                        accuracy, get_world_size, interpolate,
-#                        is_dist_avail_and_initialized, inverse_sigmoid)
 
 from models.deformable_detr.backbone import build_backbone
+from models.misc import accuracy, interpolate, inverse_sigmoid
+from utils import box_ops
+from utils.misc import distributed_world_size, is_distributed
+from utils.nested_tensor import NestedTensor, nested_tensor_from_tensor_list
+
+from .deformable_transformer import build_deforamble_transformer
 from .matcher import build_matcher
 from .segmentation import (
     DETRsegm,
+    MaskHeadSmallConv,
+    MHAttentionMap,
     PostProcessPanoptic,
     PostProcessSegm,
     dice_loss,
     sigmoid_focal_loss,
 )
-from .deformable_transformer import build_deforamble_transformer
-import copy
+
+# from util.misc import (NestedTensor, nested_tensor_from_tensor_list,
+#                        accuracy, get_world_size, interpolate,
+#                        is_dist_avail_and_initialized, inverse_sigmoid)
 
 
 def _get_clones(module, N):
@@ -55,6 +58,7 @@ class DeformableDETR(nn.Module):
         aux_loss=True,
         with_box_refine=False,
         two_stage=False,
+        masks=False,
     ):
         """Initializes the model.
         Parameters:
@@ -111,6 +115,7 @@ class DeformableDETR(nn.Module):
         self.aux_loss = aux_loss
         self.with_box_refine = with_box_refine
         self.two_stage = two_stage
+        self.masks = masks
 
         prior_prob = 0.01
         bias_value = -math.log((1 - prior_prob) / prior_prob)
@@ -145,6 +150,15 @@ class DeformableDETR(nn.Module):
             self.transformer.decoder.class_embed = self.class_embed
             for box_embed in self.bbox_embed:
                 nn.init.constant_(box_embed.layers[-1].bias.data[2:], 0.0)
+        if masks:
+            nheads = transformer.nhead
+            self.bbox_attention = MHAttentionMap(
+                hidden_dim, hidden_dim, nheads, dropout=0
+            )
+            fpn_features = backbone.num_channels[-3:]
+            self.mask_head = MaskHeadSmallConv(
+                hidden_dim + nheads, fpn_features[::-1], hidden_dim
+            )
 
     def forward(self, samples: NestedTensor):
         """The forward expects a NestedTensor, which consists of:
@@ -195,6 +209,7 @@ class DeformableDETR(nn.Module):
             hs,
             init_reference,
             inter_references,
+            memory,
             enc_outputs_class,
             enc_outputs_coord_unact,
         ) = self.transformer(srcs, masks, pos, query_embeds)
@@ -220,7 +235,22 @@ class DeformableDETR(nn.Module):
         outputs_class = torch.stack(outputs_classes)
         outputs_coord = torch.stack(outputs_coords)
 
+        if self.masks:
+            bs = features[-1].tensors.shape[0]
+            src_proj = srcs[-1]
+            bbox_mask = self.bbox_attention(hs[-1], memory, mask=masks[-1])
+            seg_masks = self.mask_head(
+                src_proj,
+                bbox_mask,
+                [features[2].tensors, features[1].tensors, features[0].tensors],
+            )
+            output_seg_masks = seg_masks.view(
+                bs, self.num_queries, seg_masks.shape[-2], seg_masks.shape[-1]
+            )
+
         out = {"pred_logits": outputs_class[-1], "pred_boxes": outputs_coord[-1]}
+        if self.masks:
+            out["pred_masks"] = output_seg_masks
         if self.aux_loss:
             out["aux_outputs"] = self._set_aux_loss(outputs_class, outputs_coord)
 
@@ -621,9 +651,10 @@ def build(args):
         aux_loss=args.aux_loss,
         with_box_refine=args.with_box_refine,
         two_stage=args.two_stage,
+        masks=args.masks,
     )
-    if args.masks:
-        model = DETRsegm(model, freeze_detr=(args.frozen_weights is not None))
+    # if args.masks:
+    #    model = DETRsegm(model, freeze_detr=(args.frozen_weights is not None))
     matcher = build_matcher(args)
     weight_dict = {"loss_ce": args.cls_loss_coef, "loss_bbox": args.bbox_loss_coef}
     weight_dict["loss_giou"] = args.giou_loss_coef

@@ -2,23 +2,24 @@
 # About: Submit or evaluate the model.
 
 import os
-import time
-import torch
 import subprocess
+import time
+
+import torch
 from accelerate import Accelerator
 from accelerate.state import PartialState
 from torch.utils.data import DataLoader
 
-from runtime_option import runtime_option
-from utils.misc import yaml_to_dict
 from configs.util import load_super_config, update_config
-from log.logger import Logger
 from data.joint_dataset import dataset_classes
 from data.seq_dataset import SeqDataset
-from models.runtime_tracker import RuntimeTracker
 from log.log import Metrics
-from models.motip import build as build_motip
+from log.logger import Logger
 from models.misc import load_checkpoint
+from models.motip import build as build_motip
+from models.runtime_tracker import RuntimeTracker
+from runtime_option import runtime_option
+from utils.misc import yaml_to_dict
 
 
 def submit_and_evaluate(config: dict):
@@ -54,6 +55,7 @@ def submit_and_evaluate(config: dict):
     logger = Logger(
         logdir=str(outputs_dir),
         use_wandb=False,
+        use_mlflow=config["USE_MLFLOW"],
         config=config,
         # exp_owner=config["EXP_OWNER"],
         # exp_project=config["EXP_PROJECT"],
@@ -156,8 +158,9 @@ def submit_and_evaluate_one_model(
     inference_dataset = dataset_classes[dataset](
         data_root=data_root,
         split=data_split,
-        load_annotation=False,
+        load_annotation=True,
     )
+    gt_annotations = inference_dataset.get_annotations()
     # Set the dtype during inference:
     match dtype:
         case "FP32":
@@ -194,6 +197,9 @@ def submit_and_evaluate_one_model(
                 inference_dataset.sequence_infos.pop(_inference_sequence_names[_])
                 inference_dataset.image_paths.pop(_inference_sequence_names[_])
         is_fake = False
+
+    max_log = 5
+    seq_idx = 0
 
     # Process each sequence:
     for sequence_name in inference_dataset.sequence_infos.keys():
@@ -244,6 +250,21 @@ def submit_and_evaluate_one_model(
             sequence_loader=sequence_loader,
             logger=logger,
         )
+
+        if seq_idx < max_log:
+            mid_frame = len(sequence_loader) // 2
+            gt_ann = gt_annotations[sequence_name][mid_frame]
+            pred_ann = sequence_results[mid_frame]
+            orig_path = sequence_dataset.image_paths[sequence_name][mid_frame]
+            logger.log_images(
+                orig_path=orig_path,
+                gt_ann=gt_ann,
+                pred_ann=pred_ann,
+                sequence_name=sequence_name,
+                frame_idx=mid_frame,
+            )
+            seq_idx += 1
+
         # Write the results to the submit file:
         if dataset in [
             "DanceTrack",

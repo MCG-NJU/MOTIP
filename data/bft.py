@@ -26,12 +26,12 @@ class BFT(DanceTrack):
     @staticmethod
     def _get_image_path(sequence_dir, frame_idx):
         return os.path.join(
-            sequence_dir, "img1", f"{frame_idx + 1:06d}.jpg"
+            sequence_dir, "img1", f"{frame_idx + 1:08d}.jpg"
         )  # different from DanceTrack
 
     @staticmethod
     def _get_mask_path(sequence_dir, obj_id, frame_idx):
-        return os.path.join(sequence_dir, "mask", str(obj_id), f"{frame_idx+1:06d}.png")
+        return os.path.join(sequence_dir, "mask", str(obj_id), f"{frame_idx+1:08d}.png")
 
     def _get_sequence_infos(self):
         sequence_names = self._get_sequence_names()

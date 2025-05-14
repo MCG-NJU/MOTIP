@@ -54,6 +54,7 @@ def train_engine(config: dict):
     logger = Logger(
         logdir=os.path.join(outputs_dir, "train"),
         use_wandb=config["USE_WANDB"],
+        use_mlflow=config["USE_MLFLOW"],
         config=config,
         exp_owner=config["EXP_OWNER"],
         exp_project=config["EXP_PROJECT"],
@@ -595,10 +596,10 @@ def train_one_epoch(
             accelerator.wait_for_everyone()
             # Clear some values:
             metrics["lr"].clear()  # clear the learning rate value from last step
-            metrics["max_cuda_mem(MB)"].clear()
+            metrics["max_cuda_mem"].clear()
             # Update them to the metrics:
             metrics.update(name="lr", value=_lr)
-            metrics.update(name="max_cuda_mem(MB)", value=_max_cuda_memory)
+            metrics.update(name="max_cuda_mem", value=_max_cuda_memory)
             # Sync the metrics:
             metrics.sync()
             eta = tps.eta(total_steps=len(dataloader), current_steps=step)
@@ -730,6 +731,7 @@ def annotations_to_flatten_detr_targets(annotations: list, device):
                 {
                     "boxes": ann["bbox"].to(device),
                     "labels": ann["category"].to(device),
+                    "masks": ann["masks"].to(device),
                 }
             )
     return targets

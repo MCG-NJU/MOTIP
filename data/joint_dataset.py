@@ -15,8 +15,11 @@ from .sportsmot import SportsMOT
 
 dataset_classes = {
     "DanceTrack": DanceTrack,
+    "DanceTrackToy": DanceTrack,
     "SportsMOT": SportsMOT,
+    "SportsMOTToy": SportsMOT,
     "BFT": BFT,
+    "BFTToy": BFT,
 }
 
 
@@ -54,6 +57,7 @@ class JointDataset(Dataset):
             try:
                 dataset_class = dataset_classes[dataset](
                     data_root=data_root,
+                    sub_dir=dataset,
                     split=split,
                     load_annotation=True,
                 )

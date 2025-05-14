@@ -8,13 +8,13 @@
 # ------------------------------------------------------------------------
 
 import copy
-from typing import Optional, List
 import math
+from typing import List, Optional
 
 import torch
 import torch.nn.functional as F
-from torch import nn, Tensor
-from torch.nn.init import xavier_uniform_, constant_, uniform_, normal_
+from torch import Tensor, nn
+from torch.nn.init import constant_, normal_, uniform_, xavier_uniform_
 
 from models.misc import inverse_sigmoid
 from models.ops.modules import MSDeformAttn
@@ -258,16 +258,27 @@ class DeformableTransformer(nn.Module):
         )
 
         inter_references_out = inter_references
+        lengths = (spatial_shapes[:, 0] * spatial_shapes[:, 1]).tolist()
+        offset = sum(lengths[:-1])
+        last_memory = memory[:, offset : offset + lengths[-1], :]
         if self.two_stage:
             raise RuntimeError(f"You should not use 'two stage'.")
             return (
                 hs,
                 init_reference_out,
                 inter_references_out,
+                last_memory.permute(0, 2, 1).view(bs, c, h, w),
                 enc_outputs_class,
                 enc_outputs_coord_unact,
             )
-        return hs, init_reference_out, inter_references_out, None, None
+        return (
+            hs,
+            init_reference_out,
+            inter_references_out,
+            last_memory.permute(0, 2, 1).view(bs, c, h, w),
+            None,
+            None,
+        )
 
 
 class DeformableTransformerEncoderLayer(nn.Module):
