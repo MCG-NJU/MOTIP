@@ -1,10 +1,22 @@
-# Multiple Object Tracking as ID Prediction
+<h1 align="center">
+  <i>Multiple Object Tracking as ID Prediction</i>
+</h1>
 
-This is the official PyTorch implementation of our paper:
+<p align="center">
+  <a href="https://ruopenggao.com" target='_blank'>Ruopeng Gao</a>,&nbsp;
+  Ji Qi,&nbsp;
+  <a href="https://wanglimin.github.io/" target='_blank'>Limin Wang</a>,&nbsp;
+  <br>
+  Nanjing University <br>
+  📧 Primary Contact: ruopenggao@gmail.com
+</p>
 
-> ***[Multiple Object Tracking as ID Prediction](https://arxiv.org/abs/2403.16848)*** <br>
-> :mortar_board: [Ruopeng Gao](https://ruopenggao.com/), Ji Qi, [Limin Wang](https://wanglimin.github.io/) <br>
-> :e-mail: Primary contact: ruopenggao@gmail.com
+<p align="center">
+  <img alt="Static Badge" src="https://img.shields.io/badge/arXiv-2403.16848-b31b1b?style=flat-square&link=https%3A%2F%2Farxiv.org%2Fabs%2F2403.16848">
+  <img alt="Static Badge" src="https://img.shields.io/badge/CVPR 2025-%F0%9F%92%A1-%235E86C1?style=flat-square&link=https%3A%2F%2Fopenaccess.thecvf.com%2Fcontent%2FCVPR2025%2Fhtml%2FGao_Multiple_Object_Tracking_as_ID_Prediction_CVPR_2025_paper.html">
+  <img alt="Static Badge" src="https://img.shields.io/badge/%E7%9F%A5%E4%B9%8E%E8%A7%A3%E8%AF%BB-%F0%9F%93%96-blue?style=flat-square&link=https%3A%2F%2Fzhuanlan.zhihu.com%2Fp%2F1907113772465759166">
+</p>
+
 
 ## :mag: Overview
 
