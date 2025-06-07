@@ -58,11 +58,13 @@ This project is built upon [Deformable DETR](https://github.com/fundamentalvisio
 If you think this project is helpful, please feel free to leave a :star: and cite our paper:
 
 ```tex
-@article{MOTIP,
-  title={Multiple Object Tracking as ID Prediction},
-  author={Gao, Ruopeng and Qi, Ji and Wang, Limin},
-  journal={arXiv preprint arXiv:2403.16848},
-  year={2024}
+@InProceedings{{MOTIP},
+    author    = {Gao, Ruopeng and Qi, Ji and Wang, Limin},
+    title     = {Multiple Object Tracking as ID Prediction},
+    booktitle = {Proceedings of the Computer Vision and Pattern Recognition Conference (CVPR)},
+    month     = {June},
+    year      = {2025},
+    pages     = {27883-27893}
 }
 ```
 
