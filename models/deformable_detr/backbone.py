@@ -104,7 +104,7 @@ class Backbone(BackboneBase):
         if name == "resnet50":
             backbone = getattr(torchvision.models, name)(
                 replace_stride_with_dilation=[False, False, dilation],
-                weights=ResNet50_Weights.IMAGENET1K_V2 if is_main_process() else None, norm_layer=norm_layer)
+                weights=ResNet50_Weights.IMAGENET1K_V1 if is_main_process() else None, norm_layer=norm_layer)
         else:
             raise NotImplementedError(f"Do not support backbone name {name}.")
         assert name not in ('resnet18', 'resnet34'), "number of channels are hard coded"
