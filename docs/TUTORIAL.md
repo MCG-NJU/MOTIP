@@ -16,3 +16,15 @@ Since our model utilizes *long-term sequence training*, *relative temporal posit
 - `MISS_TOLERANCE`: The temporal tolerance of re-appear targets during inference.
 
 **A quick and straightforward setting rule is: `SAMPLE_LENGTHS == REL_PE_LENGTH >= MISS_TOLERANCE`.**
+
+## Thresholds
+Although our method is end-to-end, we still need some thresholds to control the model's behavior during inference (like DETRs need thresholds to select positive targets). As we decouple the object detection and association processes, the thresholds are also divided into two parts.
+
+1. **Object Detection.** DETR outputs numerous detection results, but we do not need to process all of them in tracking, as this would lead to excessive computational overhead. Therefore, we use the following thresholds to control the process in the current frame:
+
+   1) `DET_THRESH`: A target will only be selected and fed into the ID Decoder if its confidence exceeds this threshold.
+   2) `NEWBORN_THRESH`: When a target does not match any historical trajectory, it can be marked as a newborn target only if it exceeds this threshold. This is to make the generation of new trajectories as reliable as possible.
+
+2. **Object Association.** The ID Decoder outputs a probability distribution of a target being assigned to different IDs, so we need a threshold to control the minimum confidence:
+   1) `ID_THRESH`: Only when the confidence assigned to an ID is greater than this threshold can it be regarded as a valid allocation.
+  
